@@ -1,0 +1,109 @@
+// Prisma Schema for Mercury Creation and Design CRM
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ServiceType {
+  UX_UI
+  WEB_DEVELOPMENT
+  CUSTOM_SOFTWARE
+  META_GOOGLE_ADS
+  BRANDING
+  MONTHLY_MAINTENANCE
+}
+
+enum LeadStatus {
+  NUEVO
+  RELEVAMIENTO
+  PROPUESTA_ENVIADA
+  EN_NEGOCIACION
+  GANADO
+  PERDIDO
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  X_TWITTER
+}
+
+model Lead {
+  id              String              @id @default(uuid())
+  nombre          String
+  empresa         String?
+  email           String?
+  telefono        String?
+  servicioInteres ServiceType         @default(WEB_DEVELOPMENT)
+  estado          LeadStatus          @default(NUEVO)
+  valorEstimado   Decimal?            @db.Decimal(12, 2)
+  moneda          String              @default("USD")
+  origen          String              @default("Web")
+  notas           String?             @db.Text
+  interacciones   SocialInteraction[]
+  cotizaciones    Quote[]
+  proyectos       Project[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+model SocialInteraction {
+  id          String         @id @default(uuid())
+  plataforma  SocialPlatform
+  externalId  String?
+  remitente   String
+  contenido   String         @db.Text
+  datosCrudos Json?
+  leadId      String?
+  lead        Lead?          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  fecha       DateTime       @default(now())
+}
+
+model Quote {
+  id          String     @id @default(uuid())
+  leadId      String
+  lead        Lead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  titulo      String
+  items       Json
+  montoTotal  Decimal    @db.Decimal(12, 2)
+  moneda      String     @default("USD")
+  estado      String     @default("BORRADOR")
+  pdfPath     String?
+  validoHasta DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Project {
+  id           String    @id @default(uuid())
+  nombre       String
+  leadId       String
+  lead         Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  faseActual   String    @default("Wireframes")
+  figmaUrl     String?
+  gitUrl       String?
+  stagingUrl   String?
+  activo       Boolean   @default(true)
+  fechaInicio  DateTime  @default(now())
+  fechaEntrega DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Retainer {
+  id             String    @id @default(uuid())
+  clienteNombre  String
+  empresa        String
+  servicio       String
+  cuotaMensual   Decimal   @db.Decimal(12, 2)
+  moneda         String    @default("USD")
+  diaCobro       Int       @default(1)
+  proximaFecha   DateTime?
+  estado         String    @default("ACTIVO")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}

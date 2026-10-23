@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #060914;
+  --foreground: #f1f5f9;
+  --card-bg: rgba(13, 22, 48, 0.75);
+  --card-border: rgba(99, 130, 191, 0.2);
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-purple: #8b5cf6;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 16, 35, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 130, 191, 0.35);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 130, 191, 0.6);
+}
+
+/* Glassmorphic utilities */
+.glass-panel {
+  background: rgba(13, 24, 52, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(99, 130, 191, 0.2);
+}
+
+.glass-card {
+  background: rgba(17, 28, 64, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 130, 191, 0.22);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(22, 36, 82, 0.75);
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 8px 24px -4px rgba(2, 6, 23, 0.5), 0 0 15px -2px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.4);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.35);
+}
+
+/* Subtle background stars effect inspired by mercurycad.com.ar */
+.cosmic-bg {
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%),
+    #050813;
 }
