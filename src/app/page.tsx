@@ -184,6 +184,14 @@ export default function Home() {
     showToast(`Lead actualizado a la etapa: ${newStatus.replace("_", " ")}`);
   };
 
+  const handleUpdateLead = (updatedLead: Lead) => {
+    setLeads((prev) =>
+      prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
+    );
+    setSelectedLead(updatedLead);
+    showToast(`Prospecto ${updatedLead.empresa} actualizado.`);
+  };
+
   const handleSaveNewLead = (newLead: Lead) => {
     setLeads((prev) => [newLead, ...prev]);
     showToast(`Nuevo lead ingresado: ${newLead.nombre} (${newLead.empresa})`);
@@ -479,6 +487,7 @@ export default function Home() {
         lead={selectedLead}
         onClose={() => setSelectedLead(null)}
         onUpdateStatus={handleUpdateLeadStatus}
+        onUpdateLead={handleUpdateLead}
         onGoToQuote={(lead) => {
           setActiveTab("quotes");
         }}

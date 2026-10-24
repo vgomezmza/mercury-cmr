@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Lead, LeadStatus, ServiceType } from "../types/crm";
+import { Lead, LeadStatus, ServiceType, VerificationStatus } from "../types/crm";
 import { SERVICE_LABELS } from "./PipelineKanban";
 import {
   Building2,
@@ -20,7 +20,11 @@ import {
   Layers,
   ChevronRight,
   Sparkles,
+  ShieldCheck,
+  ShieldAlert,
+  Clock,
 } from "lucide-react";
+import { extractSocialHandle } from "../lib/prospectVerification";
 
 interface ProspectsDirectoryProps {
   leads: Lead[];
@@ -38,6 +42,7 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState("TODOS");
   const [selectedStatus, setSelectedStatus] = useState("TODOS");
+  const [selectedVerification, setSelectedVerification] = useState("TODOS");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -56,9 +61,16 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
       const matchStatus =
         selectedStatus === "TODOS" || lead.estado === selectedStatus;
 
-      return matchSearch && matchService && matchStatus;
+      const matchVerification =
+        selectedVerification === "TODOS"
+          ? true
+          : selectedVerification === "PENDIENTE"
+          ? !lead.verificacionEstado || lead.verificacionEstado === "PENDIENTE"
+          : lead.verificacionEstado === selectedVerification;
+
+      return matchSearch && matchService && matchStatus && matchVerification;
     });
-  }, [leads, searchTerm, selectedService, selectedStatus]);
+  }, [leads, searchTerm, selectedService, selectedStatus, selectedVerification]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice(
@@ -68,6 +80,16 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
 
   const totalValue = useMemo(() => {
     return leads.reduce((acc, curr) => acc + (curr.valorEstimado || 0), 0);
+  }, [leads]);
+
+  const verifiedCount = useMemo(() => {
+    return leads.filter((l) => l.verificacionEstado === "VERIFICADO").length;
+  }, [leads]);
+
+  const pendingCount = useMemo(() => {
+    return leads.filter(
+      (l) => !l.verificacionEstado || l.verificacionEstado === "PENDIENTE"
+    ).length;
   }, [leads]);
 
   return (
@@ -87,7 +109,7 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
 
         <div className="glass-panel p-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20">
           <div className="flex items-center justify-between text-xs text-emerald-400 font-bold uppercase">
-            <span>Potencial Total Pipeline</span>
+            <span>Potencial Pipeline</span>
             <DollarSign className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-black text-white mt-1.5">
@@ -100,32 +122,35 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
 
         <div className="glass-panel p-4 rounded-2xl border border-purple-500/30 bg-purple-950/20">
           <div className="flex items-center justify-between text-xs text-purple-400 font-bold uppercase">
-            <span>Alta Prioridad</span>
-            <Sparkles className="w-4 h-4 text-purple-400" />
+            <span>Auditoría de Datos</span>
+            <ShieldCheck className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="text-2xl font-black text-white mt-1.5">
-            {leads.filter((l) => l.prioridad === "Alta").length}
+          <div className="text-2xl font-black text-white mt-1.5 flex items-baseline gap-2">
+            <span>{verifiedCount}</span>
+            <span className="text-xs font-normal text-slate-400">
+              / {leads.length} auditados
+            </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            Empresas con +50 empleados y desafíos de alto impacto.
+          <p className="text-[11px] text-purple-300 mt-0.5">
+            {pendingCount} pendientes de validación en redes.
           </p>
         </div>
 
         <div className="glass-panel p-4 rounded-2xl border border-cyan-500/30 bg-cyan-950/20">
           <div className="flex items-center justify-between text-xs text-cyan-400 font-bold uppercase">
-            <span>Canal Principal</span>
+            <span>Canal B2B Principal</span>
             <Briefcase className="w-4 h-4 text-cyan-400" />
           </div>
-          <div className="text-2xl font-black text-white mt-1.5">LinkedIn B2B</div>
+          <div className="text-2xl font-black text-white mt-1.5">LinkedIn &amp; Redes</div>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            100% de perfiles corporativos identificados.
+            1-clic a perfiles, decisores y dominios web.
           </p>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
       <div className="p-4 glass-panel rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3">
-        <div className="relative w-full md:w-96">
+        <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -140,6 +165,22 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto">
+          {/* Verification Status Filter */}
+          <select
+            value={selectedVerification}
+            onChange={(e) => {
+              setSelectedVerification(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="bg-slate-900 border border-purple-500/40 text-purple-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-purple-400 font-medium"
+          >
+            <option value="TODOS">Todas las Auditorías</option>
+            <option value="VERIFICADO">✓ Solo Verificados ({verifiedCount})</option>
+            <option value="PENDIENTE">🕒 Pendientes ({pendingCount})</option>
+            <option value="REQUIERE_ACTUALIZACION">⚠ Requieren Actualización</option>
+          </select>
+
+          {/* Service Filter */}
           <select
             value={selectedService}
             onChange={(e) => {
@@ -156,6 +197,7 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
             ))}
           </select>
 
+          {/* Pipeline Stage Filter */}
           <select
             value={selectedStatus}
             onChange={(e) => {
@@ -182,7 +224,8 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
               <tr>
                 <th className="py-3 px-4">Empresa / Contacto</th>
                 <th className="py-3 px-3">Servicio Sugerido</th>
-                <th className="py-3 px-3">Desafío & Propuesta Mercury</th>
+                <th className="py-3 px-3">Desafío &amp; Propuesta Mercury</th>
+                <th className="py-3 px-3 text-center">Auditoría Redes</th>
                 <th className="py-3 px-3 text-right">Presupuesto</th>
                 <th className="py-3 px-3 text-center">Etapa</th>
                 <th className="py-3 px-4 text-right">Acción</th>
@@ -191,13 +234,15 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
             <tbody className="divide-y divide-slate-800/60">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500">
-                    No se encontraron prospectos que coincidan con la búsqueda.
+                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                    No se encontraron prospectos que coincidan con la búsqueda o filtro seleccionado.
                   </td>
                 </tr>
               ) : (
                 paginated.map((lead) => {
                   const service = SERVICE_LABELS[lead.servicioInteres];
+                  const handle = extractSocialHandle(lead.notas);
+                  const verStatus = lead.verificacionEstado || "PENDIENTE";
 
                   return (
                     <tr
@@ -233,10 +278,38 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
                       </td>
 
                       {/* Desafío y Propuesta */}
-                      <td className="py-3 px-3 max-w-md">
+                      <td className="py-3 px-3 max-w-sm">
                         <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
                           {lead.notas}
                         </p>
+                      </td>
+
+                      {/* Auditoría Redes / Verificación */}
+                      <td className="py-3 px-3 text-center whitespace-nowrap">
+                        <div className="flex flex-col items-center gap-1">
+                          {verStatus === "VERIFICADO" ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                              <span>Verificado</span>
+                            </span>
+                          ) : verStatus === "REQUIERE_ACTUALIZACION" ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                              <ShieldAlert className="w-3 h-3 text-amber-400" />
+                              <span>Por Corregir</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-700 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-slate-500" />
+                              <span>Sin Auditar</span>
+                            </span>
+                          )}
+
+                          {handle && (
+                            <span className="text-[9px] text-cyan-400 font-mono">
+                              @{handle}
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Presupuesto */}

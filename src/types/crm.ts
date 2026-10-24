@@ -43,6 +43,8 @@ export interface SocialInteraction {
   sentiment?: "Positivo" | "Neutro" | "Interés Alto";
 }
 
+export type VerificationStatus = "VERIFICADO" | "PENDIENTE" | "REQUIERE_ACTUALIZACION";
+
 export interface Lead {
   id: string;
   nombre: string;
@@ -58,6 +60,11 @@ export interface Lead {
   prioridad: "Alta" | "Media" | "Baja";
   createdAt: string;
   tiempoSinContactoHoras?: number;
+  verificacionEstado?: VerificationStatus;
+  verificacionFecha?: string;
+  verificacionNotas?: string;
+  linkedinUrl?: string;
+  websiteUrl?: string;
 }
 
 export interface Retainer {
