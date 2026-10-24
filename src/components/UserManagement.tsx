@@ -22,6 +22,8 @@ import {
   ToggleRight,
   Edit2,
   Trash2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 interface UserManagementProps {
@@ -40,6 +42,9 @@ export const UserManagement: React.FC<UserManagementProps> = ({
   currentUser,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [passwordModalUser, setPasswordModalUser] = useState<User | null>(null);
+  const [changePasswordValue, setChangePasswordValue] = useState("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("mercury2026");
@@ -295,19 +300,31 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
-                      {!isCurrent && (
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => {
-                            if (confirm(`¿Eliminar definitivamente a ${u.nombre}?`)) {
-                              onDeleteUser(u.id);
-                            }
+                            setPasswordModalUser(u);
+                            setChangePasswordValue(u.password || "");
                           }}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors"
-                          title="Eliminar usuario"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-950/30 transition-colors"
+                          title="Cambiar contraseña de este usuario"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Key className="w-3.5 h-3.5" />
                         </button>
-                      )}
+                        {!isCurrent && (
+                          <button
+                            onClick={() => {
+                              if (confirm(`¿Eliminar definitivamente a ${u.nombre}?`)) {
+                                onDeleteUser(u.id);
+                              }
+                            }}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors"
+                            title="Eliminar usuario"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -544,6 +561,91 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   className="px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-500 shadow-md shadow-purple-600/30"
                 >
                   Confirmar y Crear
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Password Reset Modal */}
+      {passwordModalUser && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel border border-slate-700 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <Key className="w-4 h-4" />
+                </span>
+                <div>
+                  <h3 className="font-bold text-sm text-white">
+                    Actualizar Contraseña
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Usuario: <strong className="text-slate-200">{passwordModalUser.nombre}</strong> ({passwordModalUser.email})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPasswordModalUser(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!changePasswordValue || changePasswordValue.length < 4) {
+                  alert("La contraseña debe tener al menos 4 caracteres.");
+                  return;
+                }
+                onUpdateUser({ ...passwordModalUser, password: changePasswordValue });
+                setFeedbackMessage(`Contraseña de ${passwordModalUser.nombre} actualizada correctamente.`);
+                setPasswordModalUser(null);
+                setChangePasswordValue("");
+                setTimeout(() => setFeedbackMessage(null), 3000);
+              }}
+              className="space-y-4 mt-4"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                  <span>Nueva Contraseña</span>
+                  <span className="text-[11px] text-slate-500">Mínimo 4 caracteres</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showChangePassword ? "text" : "password"}
+                    required
+                    value={changePasswordValue}
+                    onChange={(e) => setChangePasswordValue(e.target.value)}
+                    placeholder="Ingrese la nueva clave"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-amber-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowChangePassword(!showChangePassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
+                  >
+                    {showChangePassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setPasswordModalUser(null)}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 shadow-md shadow-amber-600/30"
+                >
+                  Guardar Nueva Contraseña
                 </button>
               </div>
             </form>

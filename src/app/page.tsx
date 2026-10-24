@@ -7,7 +7,6 @@ import { SocialHub } from "../components/SocialHub";
 import { QuoteCalculator } from "../components/QuoteCalculator";
 import { RetainersProjects } from "../components/RetainersProjects";
 import { NewLeadModal } from "../components/NewLeadModal";
-import { SocialSimulatorModal } from "../components/SocialSimulatorModal";
 import { LeadDetailModal } from "../components/LeadDetailModal";
 import { ProspectsDirectory } from "../components/ProspectsDirectory";
 import { ChannelSettings } from "../components/ChannelSettings";
@@ -80,7 +79,14 @@ export default function Home() {
     setCurrentUser(user);
     if (remember) {
       try {
-        localStorage.setItem("mercurycad_active_user", JSON.stringify(user));
+        const { password: _, ...safeUser } = user;
+        localStorage.setItem("mercurycad_active_user", JSON.stringify(safeUser));
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      try {
+        localStorage.removeItem("mercurycad_active_user");
       } catch (e) {
         console.error(e);
       }
@@ -127,7 +133,6 @@ export default function Home() {
 
   // Modals states
   const [isNewLeadOpen, setIsNewLeadOpen] = useState(false);
-  const [isSocialSimulatorOpen, setIsSocialSimulatorOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   // Toast notification state
@@ -151,8 +156,18 @@ export default function Home() {
       prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
     );
     if (currentUser?.id === updatedUser.id) {
+      if (!updatedUser.activo) {
+        handleLogout();
+        showToast("Tu cuenta ha sido deshabilitada por la Dirección.");
+        return;
+      }
       setCurrentUser(updatedUser);
-      localStorage.setItem("mercurycad_active_user", JSON.stringify(updatedUser));
+      try {
+        const { password: _, ...safeUser } = updatedUser;
+        localStorage.setItem("mercurycad_active_user", JSON.stringify(safeUser));
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -226,17 +241,6 @@ export default function Home() {
       )
     );
     showToast("Respuesta oficial registrada y enviada al canal del cliente.");
-  };
-
-  // Simulator hook
-  const handleSimulatedEvent = (interaction: SocialInteraction, lead?: Lead) => {
-    setSocialFeed((prev) => [interaction, ...prev]);
-    if (lead) {
-      setLeads((prev) => [lead, ...prev]);
-      showToast(`¡Nuevo webhook recibido de ${interaction.plataforma}! Lead registrado.`);
-    } else {
-      showToast(`¡Nueva consulta detectada en ${interaction.plataforma}!`);
-    }
   };
 
   // If session is checking or no authenticated user, show login screen
@@ -337,7 +341,6 @@ export default function Home() {
       {/* Main Header with User Profile Badge & Logout */}
       <Header
         onOpenNewLead={() => setIsNewLeadOpen(true)}
-        onOpenSocialSimulator={() => setIsSocialSimulatorOpen(true)}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         leadsCount={leads.length}
@@ -470,12 +473,6 @@ export default function Home() {
         isOpen={isNewLeadOpen}
         onClose={() => setIsNewLeadOpen(false)}
         onSaveLead={handleSaveNewLead}
-      />
-
-      <SocialSimulatorModal
-        isOpen={isSocialSimulatorOpen}
-        onClose={() => setIsSocialSimulatorOpen(false)}
-        onSimulate={handleSimulatedEvent}
       />
 
       <LeadDetailModal

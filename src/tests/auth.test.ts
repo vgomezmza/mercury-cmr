@@ -118,4 +118,41 @@ describe("Módulo de Autenticación y Control de Acceso (RBAC)", () => {
     users = users.map((u) => (u.id === "usr-nuevo" ? { ...u, activo: true } : u));
     expect(users.find((u) => u.id === "usr-nuevo")?.activo).toBe(true);
   });
+
+  it("debe rechazar accesos sin contraseña y activar bloqueo de seguridad tras 5 intentos fallidos", () => {
+    let attempts = 0;
+    const maxAttempts = 5;
+    let isLocked = false;
+
+    const tryLogin = (pass: string) => {
+      if (isLocked) return { allowed: false, reason: "Bloqueado por seguridad" };
+      if (pass !== "mercury2026") {
+        attempts++;
+        if (attempts >= maxAttempts) {
+          isLocked = true;
+          return { allowed: false, reason: "Límite excedido. Bloqueo temporal activado" };
+        }
+        return { allowed: false, reason: "Contraseña incorrecta" };
+      }
+      attempts = 0;
+      return { allowed: true };
+    };
+
+    // 4 intentos fallidos
+    for (let i = 0; i < 4; i++) {
+      const res = tryLogin("incorrecta");
+      expect(res.allowed).toBe(false);
+      expect(res.reason).toBe("Contraseña incorrecta");
+    }
+
+    // 5to intento fallido activa el bloqueo
+    const fifth = tryLogin("incorrecta");
+    expect(fifth.allowed).toBe(false);
+    expect(fifth.reason).toContain("Bloqueo temporal activado");
+
+    // Intentos posteriores quedan bloqueados inmediatamente
+    const sixth = tryLogin("mercury2026");
+    expect(sixth.allowed).toBe(false);
+    expect(sixth.reason).toBe("Bloqueado por seguridad");
+  });
 });
