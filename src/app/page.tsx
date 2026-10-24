@@ -412,6 +412,7 @@ export default function Home() {
             onGoToQuote={(lead) => {
               setActiveTab("quotes");
             }}
+            onOpenNewLead={() => setIsNewLeadOpen(true)}
           />
         )}
 
@@ -481,6 +482,7 @@ export default function Home() {
         isOpen={isNewLeadOpen}
         onClose={() => setIsNewLeadOpen(false)}
         onSaveLead={handleSaveNewLead}
+        existingLeads={leads}
       />
 
       <LeadDetailModal

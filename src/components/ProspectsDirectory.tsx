@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Clock,
+  UserPlus,
 } from "lucide-react";
 import { extractSocialHandle } from "../lib/prospectVerification";
 
@@ -31,6 +32,7 @@ interface ProspectsDirectoryProps {
   onSelectLead: (lead: Lead) => void;
   onUpdateStatus: (id: string, status: LeadStatus) => void;
   onGoToQuote: (lead: Lead) => void;
+  onOpenNewLead?: () => void;
 }
 
 export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
@@ -38,6 +40,7 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
   onSelectLead,
   onUpdateStatus,
   onGoToQuote,
+  onOpenNewLead,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState("TODOS");
@@ -213,6 +216,17 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
             <option value="EN_NEGOCIACION">En Negociación</option>
             <option value="GANADO">Ganado</option>
           </select>
+
+          {onOpenNewLead && (
+            <button
+              onClick={onOpenNewLead}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-md shadow-blue-500/25 transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95"
+              title="Buscar o cargar un nuevo prospecto con el radar de redes sociales"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>+ Buscar / Nuevo Lead</span>
+            </button>
+          )}
         </div>
       </div>
 
