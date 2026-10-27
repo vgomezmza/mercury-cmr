@@ -125,11 +125,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Welcome Banner */}
-      <div className="glass-panel border border-slate-800/90 rounded-3xl p-6 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-blue-950/20 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="glass-panel border border-[#6382BF]/25 rounded-3xl p-6 relative overflow-hidden bg-gradient-to-r from-[#030212]/95 via-[#0A1240]/80 to-[#0D1B3E]/60 shadow-xl">
+        {/* Subtle Mercury CAD constellation watermark */}
+        <div className="absolute right-2 -bottom-4 w-72 h-36 opacity-10 pointer-events-none select-none flex items-center justify-end">
+          <img
+            src="/brand/mercury-logo-white.png"
+            alt=""
+            className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(55,94,251,0.6)]"
+          />
+        </div>
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30">
+              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider bg-[#375EFB]/15 text-[#C0C1E6] border border-[#375EFB]/30 font-poppins">
                 {isAdmin ? "Panel de Dirección" : "Tablero Personal de Gestión"}
               </span>
               <span className="text-xs text-slate-500">•</span>
@@ -142,10 +151,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-poppins">
               ¡Hola, {currentUser.nombre.split(" ")[0]}!
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
               {isAdmin
                 ? "Vista global y supervisión de la cartera comercial de toda la agencia Mercury CAD."
                 : `Aquí tienes la gestión de tus clientes. Administra tus cuentas propias y las asignadas por Dirección.`}
@@ -155,8 +164,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {!isAdmin && (
               <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-800/60">
                 <span className="text-xs text-slate-400 font-medium">Origen de tu cartera:</span>
-                <span className="text-xs px-2.5 py-1 rounded-xl bg-slate-800/80 text-slate-200 border border-slate-700/80">
-                  <strong className="text-blue-400 font-bold">{ownCreatedCount}</strong> cargados por ti
+                <span className="text-xs px-2.5 py-1 rounded-xl bg-[#0A1240]/80 text-[#C0C1E6] border border-[#6382BF]/30">
+                  <strong className="text-[#375EFB] font-bold">{ownCreatedCount}</strong> cargados por ti
                 </span>
                 <span className="text-xs px-2.5 py-1 rounded-xl bg-purple-950/40 text-purple-300 border border-purple-500/30">
                   <strong className="text-purple-300 font-bold">{assignedByAdminCount}</strong> cedidos por Dirección
@@ -169,7 +178,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {/* Admin Filter Dropdown */}
             {isAdmin && setAdminFilterUserId && (
-              <div className="flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-2xl px-3 py-2 text-xs">
+              <div className="flex items-center gap-2 bg-[#0A1240]/90 border border-[#6382BF]/30 rounded-2xl px-3 py-2 text-xs">
                 <Shield className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                 <span className="text-slate-400 font-medium">Ver Cartera:</span>
                 <select
@@ -177,7 +186,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   onChange={(e) => setAdminFilterUserId(e.target.value)}
                   className="bg-transparent text-white font-bold outline-none cursor-pointer text-xs"
                 >
-                  <option value="ALL" className="bg-slate-900 text-white">
+                  <option value="ALL" className="bg-[#030212] text-white">
                     Toda la Agencia ({leads.length})
                   </option>
                   {users
@@ -185,12 +194,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     .map((u) => {
                       const count = leads.filter((l) => l.asignadoAId === u.id).length;
                       return (
-                        <option key={u.id} value={u.id} className="bg-slate-900 text-white">
+                        <option key={u.id} value={u.id} className="bg-[#030212] text-white">
                           {u.nombre} ({count})
                         </option>
                       );
                     })}
-                  <option value="UNASSIGNED" className="bg-slate-900 text-amber-300">
+                  <option value="UNASSIGNED" className="bg-[#030212] text-amber-300">
                     Sin Asignar ({leads.filter((l) => !l.asignadoAId).length})
                   </option>
                 </select>
@@ -200,7 +209,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {isAdmin && (
               <button
                 onClick={() => onNavigateTab("users")}
-                className="px-4 py-2.5 rounded-2xl text-xs font-bold text-purple-200 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-400 shadow-lg shadow-purple-900/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+                className="px-4 py-2.5 rounded-2xl text-xs font-bold text-purple-200 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-400 shadow-lg shadow-purple-900/30 transition-all flex items-center justify-center gap-2 active:scale-95 font-poppins"
                 title="Abrir el menú lateral de gestión de usuarios"
               >
                 <UserPlus className="w-4 h-4 text-purple-400" />
@@ -210,7 +219,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
             <button
               onClick={onOpenNewLead}
-              className="px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 border border-blue-400/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+              className="px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-[#375EFB] to-[#2e3194] hover:from-[#476dfb] hover:to-[#375EFB] shadow-lg shadow-[#375EFB]/35 border border-white/20 transition-all flex items-center justify-center gap-2 active:scale-95 font-poppins"
             >
               <Plus className="w-4 h-4" />
               <span>+ Cargar Nuevo Cliente</span>

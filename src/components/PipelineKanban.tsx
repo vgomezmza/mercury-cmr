@@ -42,12 +42,12 @@ const COLUMNS: { id: LeadStatus; label: string; color: string; dotColor: string 
 ];
 
 export const SERVICE_LABELS: Record<ServiceType, { name: string; tagClass: string }> = {
-  UX_UI: { name: "Diseño UX/UI", tagClass: "bg-purple-500/20 text-purple-300 border-purple-500/30" },
-  WEB_DEVELOPMENT: { name: "Desarrollo Web", tagClass: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
-  CUSTOM_SOFTWARE: { name: "Software a Medida", tagClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" },
-  META_GOOGLE_ADS: { name: "Google & Meta Ads", tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/30" },
-  BRANDING: { name: "Branding & Social", tagClass: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
-  MONTHLY_MAINTENANCE: { name: "Mantenimiento Web", tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" },
+  UX_UI: { name: "Diseño UX/UI", tagClass: "bg-[#2e3194]/35 text-[#C0C1E6] border border-[#2e3194]/60" },
+  WEB_DEVELOPMENT: { name: "Desarrollo Web", tagClass: "bg-[#375EFB]/20 text-[#C0C1E6] border border-[#375EFB]/40" },
+  CUSTOM_SOFTWARE: { name: "Software a Medida", tagClass: "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" },
+  META_GOOGLE_ADS: { name: "Google & Meta Ads", tagClass: "bg-amber-500/20 text-amber-300 border border-amber-500/30" },
+  BRANDING: { name: "Branding & Social", tagClass: "bg-pink-500/20 text-pink-300 border border-pink-500/30" },
+  MONTHLY_MAINTENANCE: { name: "Mantenimiento Web", tagClass: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" },
 };
 
 const ORIGIN_ICONS: Record<string, { label: string; bg: string; text: string }> = {
@@ -55,7 +55,7 @@ const ORIGIN_ICONS: Record<string, { label: string; bg: string; text: string }> 
   "Instagram DM": { label: "IG", bg: "bg-fuchsia-950/70", text: "text-pink-300" },
   "LinkedIn": { label: "in", bg: "bg-sky-950/80", text: "text-sky-300" },
   "X (Twitter)": { label: "𝕏", bg: "bg-slate-900/90", text: "text-slate-200" },
-  "Web MercuryCAD": { label: "WEB", bg: "bg-indigo-950/70", text: "text-indigo-300" },
+  "Web MercuryCAD": { label: "MERCURY", bg: "bg-[#0A1240]", text: "text-[#C0C1E6]" },
   "Referido": { label: "REF", bg: "bg-emerald-950/70", text: "text-emerald-300" },
 };
 
@@ -99,10 +99,10 @@ export const PipelineKanban: React.FC<PipelineKanbanProps> = ({
           </span>
           <button
             onClick={() => setFilterService("TODOS")}
-            className={`px-3 py-1 rounded-xl text-xs font-medium transition-all ${
+            className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all font-poppins ${
               filterService === "TODOS"
-                ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                ? "bg-[#375EFB] text-white shadow-md shadow-[#375EFB]/30 ring-1 ring-white/20"
+                : "text-slate-400 hover:text-slate-200 hover:bg-[#0A1240]/60"
             }`}
           >
             Todos ({leads.length})
@@ -113,10 +113,10 @@ export const PipelineKanban: React.FC<PipelineKanbanProps> = ({
               <button
                 key={key}
                 onClick={() => setFilterService(key)}
-                className={`px-3 py-1 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
+                className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all whitespace-nowrap font-poppins ${
                   filterService === key
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                    ? "bg-[#375EFB] text-white shadow-md shadow-[#375EFB]/30 ring-1 ring-white/20"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-[#0A1240]/60"
                 }`}
               >
                 {value.name} ({count})
@@ -273,7 +273,7 @@ export const PipelineKanban: React.FC<PipelineKanbanProps> = ({
                           {nextStatusMap[lead.estado] ? (
                             <button
                               onClick={() => onUpdateLeadStatus(lead.id, nextStatusMap[lead.estado]!)}
-                              className="px-2 py-0.5 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-white text-[10px] font-semibold flex items-center gap-1 transition-all shadow-sm active:scale-95"
+                              className="px-2.5 py-1 rounded-lg bg-[#375EFB] hover:bg-[#2e3194] text-white text-[10px] font-bold flex items-center gap-1 transition-all shadow-sm active:scale-95 font-poppins"
                               title="Avanzar etapa"
                             >
                               <span>Avanzar</span>

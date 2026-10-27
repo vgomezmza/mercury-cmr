@@ -454,10 +454,10 @@ export default function Home() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap font-poppins ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 ring-1 ring-white/20"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                      ? "bg-[#375EFB] text-white shadow-lg shadow-[#375EFB]/35 ring-1 ring-white/30"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-[#0A1240]/60"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -466,8 +466,8 @@ export default function Home() {
                     <span
                       className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
                         isActive
-                          ? "bg-white text-blue-700"
-                          : "bg-slate-800 text-slate-300 border border-slate-700"
+                          ? "bg-white text-[#2e3194]"
+                          : "bg-[#0A1240] text-[#C0C1E6] border border-[#6382BF]/30"
                       }`}
                     >
                       {tab.badge}
@@ -625,6 +625,33 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Mercury CAD Branded Footer */}
+      <footer className="glass-panel border-t border-slate-800/80 px-6 py-4 mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="flex items-center gap-2.5 font-poppins">
+            <div className="w-5 h-5 rounded-md overflow-hidden bg-[#030212] border border-[#6382BF]/40 p-0.5 shrink-0">
+              <img src="/brand/mercury-icon.png" alt="Mercury CAD" className="w-full h-full object-contain" />
+            </div>
+            <span className="text-white font-semibold">Mercury Creation & Design</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-400">Mendoza, Argentina</span>
+          </div>
+          <div className="flex items-center gap-3 text-[11px] text-[#C0C1E6]">
+            <span>info@mercurycad.com.ar</span>
+            <span className="text-slate-600">•</span>
+            <a
+              href="https://mercurycad.com.ar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#375EFB] hover:text-[#C0C1E6] font-semibold transition-colors flex items-center gap-1"
+            >
+              mercurycad.com.ar
+              <span className="text-[10px]">↗</span>
+            </a>
+          </div>
+        </div>
+      </footer>
 
       {/* Modals */}
       <NewLeadModal

@@ -297,9 +297,9 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                     handleAdvanceStage(st);
                     setActiveTab("guide");
                   }}
-                  className={`p-2.5 rounded-xl text-left transition-all border relative flex flex-col justify-between ${
+                  className={`p-2.5 rounded-xl text-left transition-all border relative flex flex-col justify-between font-poppins ${
                     isCurrent
-                      ? "bg-blue-600/30 border-blue-500 shadow-md shadow-blue-500/20 ring-1 ring-blue-400/40"
+                      ? "bg-[#375EFB]/20 border-[#375EFB] shadow-md shadow-[#375EFB]/20 ring-1 ring-[#375EFB]/40"
                       : isPassed
                       ? "bg-emerald-950/20 border-emerald-500/40 hover:bg-emerald-900/30 text-emerald-300"
                       : "bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700"
@@ -309,7 +309,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                     <span
                       className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${
                         isCurrent
-                          ? "bg-blue-500 text-white"
+                          ? "bg-[#375EFB] text-white"
                           : isPassed
                           ? "bg-emerald-500 text-slate-950"
                           : "bg-slate-800 text-slate-400"
@@ -680,7 +680,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                     {onCreateProject && (
                       <button
                         onClick={() => onCreateProject(lead)}
-                        className="p-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-all flex items-center justify-between group shadow-lg shadow-blue-600/30 text-left"
+                        className="p-3 rounded-2xl bg-gradient-to-r from-[#375EFB] to-[#2e3194] hover:from-[#476dfb] hover:to-[#375EFB] text-white font-bold text-xs transition-all flex items-center justify-between group shadow-lg shadow-[#375EFB]/30 text-left font-poppins active:scale-95 border border-white/10"
                       >
                         <div className="flex items-center gap-2.5">
                           <span className="w-7 h-7 rounded-lg bg-white/20 text-white flex items-center justify-center">

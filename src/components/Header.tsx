@@ -60,16 +60,23 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-6 py-3.5 transition-all">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Brand identity */}
+        {/* Brand identity with official Mercury CAD logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20">
-            <span className="font-extrabold text-white text-lg tracking-wider">M</span>
+          <div className="relative group">
+            <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#030212] border border-[#6382BF]/40 shadow-lg shadow-[#375EFB]/20 flex items-center justify-center p-1 group-hover:border-[#375EFB] group-hover:shadow-[#375EFB]/40 transition-all">
+              <img
+                src="/brand/mercury-icon.png"
+                alt="Mercury Creation & Design"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(55,94,251,0.5)]"
+              />
+            </div>
+            <span className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#030212]" title="Sistema Activo" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-bold text-lg text-white tracking-tight flex items-center gap-1.5">
+              <h1 className="font-extrabold text-lg text-white tracking-tight flex items-center gap-1.5 font-poppins">
                 Mercury Creation & Design
-                <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#375EFB]/20 text-[#C0C1E6] border border-[#375EFB]/40 shadow-sm">
                   CRM Local
                 </span>
               </h1>
@@ -81,8 +88,8 @@ export const Header: React.FC<HeaderProps> = ({
                   PostgreSQL 17 :5432
                 </span>
                 <span className="text-slate-600">•</span>
-                <span className="flex items-center gap-1 text-cyan-400">
-                  <Radio className="w-3 h-3 animate-spin" />
+                <span className="flex items-center gap-1 text-[#C0C1E6]">
+                  <Radio className="w-3 h-3 animate-spin text-[#375EFB]" />
                   Omnicanal
                 </span>
               </p>

@@ -1,76 +1,167 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-poppins), 'Poppins', var(--font-roboto), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-poppins: var(--font-poppins), 'Poppins', sans-serif;
+  --font-roboto: var(--font-roboto), 'Roboto', sans-serif;
+
+  /* Official Mercury CAD brand palette */
+  --color-mercury-space: #030212;
+  --color-mercury-navy: #0A1240;
+  --color-mercury-dark-navy: #0D1B3E;
+  --color-mercury-surface: #070d24;
+  --color-mercury-blue: #375EFB;
+  --color-mercury-indigo: #2e3194;
+  --color-mercury-slate: #6382BF;
+  --color-mercury-lavender: #C0C1E6;
+
+  /* Override Tailwind blue scale to match Mercury CAD electric blue & deep indigo */
+  --color-blue-400: #587bfb;
+  --color-blue-500: #375EFB;
+  --color-blue-600: #2e3194;
+  --color-blue-700: #1b1e6e;
+  --color-blue-900: #0D1B3E;
+  --color-blue-950: #0A1240;
+}
+
 :root {
-  --background: #060914;
-  --foreground: #f1f5f9;
-  --card-bg: rgba(13, 22, 48, 0.75);
-  --card-border: rgba(99, 130, 191, 0.2);
-  --accent-blue: #3b82f6;
-  --accent-cyan: #06b6d4;
-  --accent-purple: #8b5cf6;
+  --background: #030212;
+  --foreground: #FFFFFF;
+  --card-bg: rgba(10, 18, 64, 0.72);
+  --card-border: rgba(99, 130, 191, 0.22);
+  --accent-blue: #375EFB;
+  --accent-indigo: #2e3194;
+  --accent-slate: #6382BF;
+  --accent-lavender: #C0C1E6;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Mercury Slate #6382BF */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(10, 16, 35, 0.6);
+  background: rgba(3, 2, 18, 0.85);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 130, 191, 0.35);
+  background: rgba(99, 130, 191, 0.4);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 130, 191, 0.6);
+  background: rgba(55, 94, 251, 0.7);
 }
 
-/* Glassmorphic utilities */
+/* Authentic Starfield from mercurycad.com.ar (#fondo-espacial) */
+.fondo-espacial {
+  position: relative;
+  background-color: #030212;
+}
+
+.fondo-espacial::before,
+.fondo-espacial::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fondo-espacial::before {
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: 
+    150px 100px #FFF, 400px 250px #FFF, 700px 150px #FFF, 200px 500px #FFF, 
+    850px 400px #FFF, 1100px 200px #FFF, 1300px 600px #FFF, 50px 700px #FFF, 
+    950px 800px #FFF, 280px 880px #FFF, 1250px 780px #FFF, 620px 620px #FFF,
+    1450px 320px #FFF, 80px 340px #FFF, 520px 180px #FFF;
+  animation: titilar 4s infinite alternate;
+}
+
+.fondo-espacial::after {
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  box-shadow: 
+    300px 150px #FFF, 600px 350px #FFF, 900px 550px #FFF, 1200px 100px #FFF, 
+    150px 750px #FFF, 500px 850px #FFF, 1020px 450px #FFF, 780px 240px #FFF,
+    1380px 520px #FFF, 340px 420px #FFF;
+  animation: titilar 7s infinite alternate-reverse;
+  opacity: 0.75;
+}
+
+@keyframes titilar {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+}
+
+/* Cosmic gradient atmosphere inspired by Mercury CAD */
+.cosmic-bg {
+  background: 
+    radial-gradient(circle at 18% 18%, rgba(55, 94, 251, 0.16) 0%, transparent 45%),
+    radial-gradient(circle at 82% 82%, rgba(46, 49, 148, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 40%, rgba(10, 18, 64, 0.45) 0%, transparent 65%),
+    #030212;
+}
+
+/* Glassmorphic utilities styled with Mercury CAD tokens */
 .glass-panel {
-  background: rgba(13, 24, 52, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(99, 130, 191, 0.2);
+  background: rgba(10, 18, 64, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(99, 130, 191, 0.24);
 }
 
 .glass-card {
-  background: rgba(17, 28, 64, 0.6);
-  backdrop-filter: blur(10px);
+  background: rgba(13, 27, 62, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(99, 130, 191, 0.22);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  background: rgba(22, 36, 82, 0.75);
-  border-color: rgba(59, 130, 246, 0.45);
-  box-shadow: 0 8px 24px -4px rgba(2, 6, 23, 0.5), 0 0 15px -2px rgba(59, 130, 246, 0.15);
+  background: rgba(18, 34, 78, 0.85);
+  border-color: rgba(55, 94, 251, 0.55);
+  box-shadow: 0 10px 30px -5px rgba(2, 6, 23, 0.75), 0 0 22px -2px rgba(55, 94, 251, 0.3);
   transform: translateY(-2px);
 }
 
+/* Glow effects */
+.glow-mercury {
+  box-shadow: 0 0 25px -4px rgba(55, 94, 251, 0.45);
+}
+
+.glow-mercury-lg {
+  box-shadow: 0 0 45px -6px rgba(55, 94, 251, 0.55);
+}
+
 .glow-blue {
-  box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 25px -5px rgba(55, 94, 251, 0.4);
 }
 
 .glow-cyan {
   box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.35);
 }
 
-/* Subtle background stars effect inspired by mercurycad.com.ar */
-.cosmic-bg {
-  background: 
-    radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 45%),
-    radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%),
-    #050813;
-}

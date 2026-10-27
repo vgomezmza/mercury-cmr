@@ -259,16 +259,16 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 font-poppins ${
                 currentStep === 1
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  ? "bg-[#375EFB] text-white shadow-md shadow-[#375EFB]/30 ring-1 ring-white/20"
                   : currentStep > 1
                   ? "text-emerald-400 hover:bg-slate-800"
                   : "text-slate-500"
               }`}
             >
               <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black ${
-                currentStep === 1 ? "bg-white text-blue-600" : currentStep > 1 ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400"
+                currentStep === 1 ? "bg-white text-[#2e3194]" : currentStep > 1 ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400"
               }`}>
                 {currentStep > 1 ? "✓" : "1"}
               </span>
@@ -280,16 +280,16 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
             <button
               type="button"
               onClick={() => (empresa.trim() || nombre.trim() ? setCurrentStep(2) : handleGoToStep2())}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 font-poppins ${
                 currentStep === 2
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  ? "bg-[#375EFB] text-white shadow-md shadow-[#375EFB]/30 ring-1 ring-white/20"
                   : currentStep > 2
                   ? "text-emerald-400 hover:bg-slate-800"
                   : "text-slate-500 hover:text-slate-300"
               }`}
             >
               <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black ${
-                currentStep === 2 ? "bg-white text-blue-600" : currentStep > 2 ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400"
+                currentStep === 2 ? "bg-white text-[#2e3194]" : currentStep > 2 ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400"
               }`}>
                 {currentStep > 2 ? "✓" : "2"}
               </span>
@@ -301,14 +301,14 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
             <button
               type="button"
               onClick={() => (empresa.trim() || nombre.trim() ? setCurrentStep(3) : handleGoToStep2())}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 font-poppins ${
                 currentStep === 3
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  ? "bg-[#375EFB] text-white shadow-md shadow-[#375EFB]/30 ring-1 ring-white/20"
                   : "text-slate-500 hover:text-slate-300"
               }`}
             >
               <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black ${
-                currentStep === 3 ? "bg-white text-blue-600" : "bg-slate-800 text-slate-400"
+                currentStep === 3 ? "bg-white text-[#2e3194]" : "bg-slate-800 text-slate-400"
               }`}>
                 3
               </span>

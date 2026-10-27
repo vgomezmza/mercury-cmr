@@ -108,33 +108,44 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen cosmic-bg flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative ambient background glows */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen cosmic-bg flex items-center justify-center p-4 relative overflow-hidden fondo-espacial">
+      {/* Decorative ambient background glows with Mercury CAD brand colors */}
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#375EFB]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[#2e3194]/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#0A1240]/40 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-md z-10">
-        {/* Brand header */}
+        {/* Brand header with official Mercury CAD logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 shadow-xl shadow-blue-500/30 ring-1 ring-white/20 mb-4 animate-in zoom-in-95 duration-500">
-            <span className="font-black text-white text-2xl tracking-wider">M</span>
+          <div className="flex flex-col items-center justify-center mb-4">
+            <div className="relative group mb-3">
+              <div className="w-20 h-20 rounded-2xl bg-[#030212]/90 border border-[#6382BF]/40 shadow-2xl shadow-[#375EFB]/30 flex items-center justify-center p-2.5 backdrop-blur-md group-hover:border-[#375EFB] group-hover:shadow-[#375EFB]/50 transition-all duration-300">
+                <img
+                  src="/brand/mercury-icon.png"
+                  alt="Mercury CAD Constellation"
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(55,94,251,0.6)]"
+                />
+              </div>
+            </div>
+            <img
+              src="/brand/mercury-logo-white.png"
+              alt="Mercury Creation & Design"
+              className="h-10 w-auto object-contain filter drop-shadow-[0_2px_12px_rgba(55,94,251,0.4)]"
+            />
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            Mercury Creation & Design
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 flex items-center justify-center gap-2">
-            <span>CRM & Gestión Comercial</span>
+          <p className="text-xs text-[#C0C1E6] mt-1 flex items-center justify-center gap-2 font-medium">
+            <span>CRM &amp; Gestión Comercial</span>
             <span className="text-slate-600">•</span>
-            <span className="text-emerald-400 font-medium">Acceso Seguro RBAC</span>
+            <span className="text-emerald-400 font-semibold">Acceso Seguro RBAC</span>
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="glass-panel border border-slate-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        <div className="glass-panel border border-[#6382BF]/25 rounded-3xl p-6 sm:p-8 shadow-2xl relative bg-[#0A1240]/65 backdrop-blur-xl">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
             <div>
-              <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <Lock className="w-4 h-4 text-blue-400" />
+              <h2 className="text-lg font-bold text-white flex items-center gap-2 font-poppins">
+                <Lock className="w-4 h-4 text-[#375EFB]" />
                 Iniciar Sesión
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -274,13 +285,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
             <button
               type="submit"
               disabled={loading || lockoutRemaining > 0}
-              className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 border border-blue-400/30 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#375EFB] to-[#2e3194] hover:from-[#476dfb] hover:to-[#375EFB] shadow-lg shadow-[#375EFB]/35 hover:shadow-[#375EFB]/60 border border-white/20 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50 cursor-pointer font-poppins"
             >
               {loading ? (
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Ingresar de forma segura</span>
+                  <span>Ingresar al Sistema Mercury</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

@@ -892,7 +892,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({
               <div className="pt-2">
                 <button
                   onClick={handleExecuteTransfer}
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2 active:scale-95"
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#375EFB] to-[#2e3194] hover:from-[#476dfb] hover:to-[#375EFB] shadow-lg shadow-[#375EFB]/35 border border-white/20 transition-all flex items-center gap-2 active:scale-95 font-poppins"
                 >
                   <RefreshCw className="w-4 h-4" />
                   <span>Transferir Toda la Cartera</span>
