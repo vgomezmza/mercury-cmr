@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { Lead, ServiceType } from "../types/crm";
+import React, { useState, useMemo, useEffect } from "react";
+import type { Lead, ServiceType, User } from "../types/crm";
 import {
   X,
   UserPlus,
@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   Zap,
   ArrowRight,
-  User,
+  User as UserIcon,
+  Shield,
 } from "lucide-react";
 import { SERVICE_LABELS } from "./PipelineKanban";
 import {
@@ -33,6 +34,8 @@ interface NewLeadModalProps {
   onClose: () => void;
   onSaveLead: (lead: Lead) => void;
   existingLeads?: Lead[];
+  currentUser?: User | null;
+  users?: User[];
 }
 
 export const NewLeadModal: React.FC<NewLeadModalProps> = ({
@@ -40,6 +43,8 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
   onClose,
   onSaveLead,
   existingLeads = [],
+  currentUser,
+  users = [],
 }) => {
   const [nombre, setNombre] = useState("");
   const [empresa, setEmpresa] = useState("");
@@ -51,6 +56,13 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
   const [notas, setNotas] = useState("");
   const [prioridad, setPrioridad] = useState<"Alta" | "Media" | "Baja">("Alta");
   const [copiedNotification, setCopiedNotification] = useState<string | null>(null);
+  const [assignedUserId, setAssignedUserId] = useState<string>(currentUser?.id || "");
+
+  useEffect(() => {
+    if (currentUser) {
+      setAssignedUserId(currentUser.id);
+    }
+  }, [currentUser, isOpen]);
 
   // Generate live social & web scout suggestions
   const suggestions: ScoutSuggestion | null = useMemo(() => {
@@ -134,6 +146,7 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
     e.preventDefault();
     if (!nombre.trim() && !empresa.trim()) return;
 
+    const assignedUser = users.find((u) => u.id === assignedUserId) || currentUser;
     const newLead: Lead = {
       id: `lead-${Date.now()}`,
       nombre: nombre.trim() || empresa.trim(),
@@ -150,6 +163,9 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
       createdAt: "Recién ingresado",
       tiempoSinContactoHoras: 0,
       verificacionEstado: "PENDIENTE",
+      creadoPorId: currentUser?.id,
+      asignadoAId: assignedUser?.id || currentUser?.id,
+      asignadoANombre: assignedUser?.nombre || currentUser?.nombre,
     };
 
     onSaveLead(newLead);
@@ -243,7 +259,7 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-blue-500 font-medium"
                   />
                   {nombre && (
-                    <User className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
+                    <UserIcon className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
                   )}
                 </div>
               </div>
@@ -363,6 +379,37 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
                 className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none focus:border-blue-500 leading-relaxed font-normal"
               />
             </div>
+
+            {/* Assignment Section */}
+            {currentUser?.rol === "ADMIN" ? (
+              <div className="p-3 rounded-2xl bg-purple-950/20 border border-purple-500/30">
+                <label className="text-purple-300 block mb-1 font-bold text-xs flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Asignar / Ceder este cliente a:</span>
+                </label>
+                <select
+                  value={assignedUserId}
+                  onChange={(e) => setAssignedUserId(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500 font-semibold"
+                >
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.nombre} ({u.rol})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  Como Administrador puedes delegar este cliente a cualquier colaborador para que lo gestione en su tablero.
+                </span>
+              </div>
+            ) : (
+              <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-2 text-xs text-slate-400">
+                <UserIcon className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <span>
+                  Este cliente se registrará como <strong>propio</strong> en tu cartera ({currentUser?.nombre}).
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-800">
               <button

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Lead, LeadStatus, VerificationStatus } from "../types/crm";
+import type { Lead, LeadStatus, VerificationStatus, User as UserType } from "../types/crm";
 import {
   X,
   Building,
@@ -25,6 +25,8 @@ import {
   Edit2,
   Save,
   RotateCcw,
+  Shield,
+  UserCheck,
 } from "lucide-react";
 import { SERVICE_LABELS } from "./PipelineKanban";
 import {
@@ -38,6 +40,9 @@ interface LeadDetailModalProps {
   onUpdateStatus: (id: string, status: LeadStatus) => void;
   onGoToQuote: (lead: Lead) => void;
   onUpdateLead?: (updatedLead: Lead) => void;
+  currentUser?: UserType | null;
+  users?: UserType[];
+  onAssignLead?: (leadId: string, assignedUserId: string, assignedUserName: string) => void;
 }
 
 export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
@@ -46,6 +51,9 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   onUpdateStatus,
   onGoToQuote,
   onUpdateLead,
+  currentUser,
+  users = [],
+  onAssignLead,
 }) => {
   if (!lead) return null;
 
@@ -223,6 +231,59 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
         {/* TAB 1: INFORMACIÓN GENERAL */}
         {activeTab === "info" && (
           <div className="space-y-4 animate-in fade-in duration-150">
+            {/* Account Assignment Banner */}
+            <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="p-2 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/20">
+                  <UserCheck className="w-4 h-4" />
+                </span>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-500 block">
+                    Responsable de la Cuenta
+                  </span>
+                  <div className="font-bold text-white text-xs flex items-center gap-2">
+                    <span>{lead.asignadoANombre || "Sin asignar"}</span>
+                    {lead.asignadoAId === currentUser?.id && (
+                      <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.2 rounded-full">
+                        Tu Cartera
+                      </span>
+                    )}
+                    {lead.asignadoAId === currentUser?.id && lead.creadoPorId && lead.creadoPorId !== currentUser?.id && (
+                      <span className="text-[10px] bg-purple-950/80 text-purple-300 border border-purple-500/40 px-2 py-0.2 rounded-full">
+                        Cedido por Admin
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Admin Reassignment Dropdown */}
+              {currentUser?.rol === "ADMIN" && onAssignLead && (
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span className="text-slate-400 text-xs font-medium">Ceder a:</span>
+                  <select
+                    value={lead.asignadoAId || ""}
+                    onChange={(e) => {
+                      const selectedUser = users.find((u) => u.id === e.target.value);
+                      onAssignLead(
+                        lead.id,
+                        e.target.value,
+                        selectedUser ? selectedUser.nombre : "Sin Asignar"
+                      );
+                    }}
+                    className="bg-slate-950 border border-purple-500/40 text-purple-200 text-xs font-semibold rounded-xl px-2.5 py-1.5 outline-none cursor-pointer focus:border-purple-400"
+                  >
+                    <option value="">Sin Asignar</option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.nombre} ({u.rol})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
             {/* Quick Contact info grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-slate-900/70 rounded-2xl border border-slate-800 text-xs">
               <div>

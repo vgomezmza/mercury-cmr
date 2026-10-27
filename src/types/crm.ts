@@ -65,6 +65,9 @@ export interface Lead {
   verificacionNotas?: string;
   linkedinUrl?: string;
   websiteUrl?: string;
+  asignadoAId?: string;
+  asignadoANombre?: string;
+  creadoPorId?: string;
 }
 
 export interface Retainer {

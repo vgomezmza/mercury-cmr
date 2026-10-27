@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Lead, LeadStatus, ServiceType, VerificationStatus } from "../types/crm";
+import type { Lead, LeadStatus, ServiceType, VerificationStatus, User as UserType } from "../types/crm";
 import { SERVICE_LABELS } from "./PipelineKanban";
 import {
   Building2,
@@ -33,6 +33,9 @@ interface ProspectsDirectoryProps {
   onUpdateStatus: (id: string, status: LeadStatus) => void;
   onGoToQuote: (lead: Lead) => void;
   onOpenNewLead?: () => void;
+  currentUser?: UserType | null;
+  users?: UserType[];
+  onAssignLead?: (leadId: string, assignedUserId: string, assignedUserName: string) => void;
 }
 
 export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
@@ -41,11 +44,15 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
   onUpdateStatus,
   onGoToQuote,
   onOpenNewLead,
+  currentUser,
+  users = [],
+  onAssignLead,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState("TODOS");
   const [selectedStatus, setSelectedStatus] = useState("TODOS");
   const [selectedVerification, setSelectedVerification] = useState("TODOS");
+  const [selectedAssigned, setSelectedAssigned] = useState("TODOS");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -71,9 +78,16 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
           ? !lead.verificacionEstado || lead.verificacionEstado === "PENDIENTE"
           : lead.verificacionEstado === selectedVerification;
 
-      return matchSearch && matchService && matchStatus && matchVerification;
+      const matchAssigned =
+        selectedAssigned === "TODOS"
+          ? true
+          : selectedAssigned === "UNASSIGNED"
+          ? !lead.asignadoAId
+          : lead.asignadoAId === selectedAssigned;
+
+      return matchSearch && matchService && matchStatus && matchVerification && matchAssigned;
     });
-  }, [leads, searchTerm, selectedService, selectedStatus, selectedVerification]);
+  }, [leads, searchTerm, selectedService, selectedStatus, selectedVerification, selectedAssigned]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice(
@@ -217,6 +231,26 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
             <option value="GANADO">Ganado</option>
           </select>
 
+          {/* Admin Collaborator Filter */}
+          {currentUser?.rol === "ADMIN" && (
+            <select
+              value={selectedAssigned}
+              onChange={(e) => {
+                setSelectedAssigned(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="bg-slate-900 border border-slate-700 text-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:border-purple-400 font-medium"
+            >
+              <option value="TODOS">Todos los Responsables</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre}
+                </option>
+              ))}
+              <option value="UNASSIGNED">Sin Asignar</option>
+            </select>
+          )}
+
           {onOpenNewLead && (
             <button
               onClick={onOpenNewLead}
@@ -238,6 +272,7 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
               <tr>
                 <th className="py-3 px-4">Empresa / Contacto</th>
                 <th className="py-3 px-3">Servicio Sugerido</th>
+                <th className="py-3 px-3">Responsable</th>
                 <th className="py-3 px-3">Desafío &amp; Propuesta Mercury</th>
                 <th className="py-3 px-3 text-center">Auditoría Redes</th>
                 <th className="py-3 px-3 text-right">Presupuesto</th>
@@ -248,7 +283,7 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
             <tbody className="divide-y divide-slate-800/60">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                  <td colSpan={8} className="py-12 text-center text-slate-500">
                     No se encontraron prospectos que coincidan con la búsqueda o filtro seleccionado.
                   </td>
                 </tr>
@@ -289,6 +324,48 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
                         <span className="block text-[10px] text-slate-500 mt-1 font-mono">
                           {lead.origen}
                         </span>
+                      </td>
+
+                      {/* Responsable */}
+                      <td className="py-3 px-3 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1.5">
+                          {lead.asignadoANombre ? (
+                            <span
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                lead.asignadoAId === currentUser?.id
+                                  ? "bg-blue-950/80 text-blue-300 border-blue-500/40"
+                                  : "bg-slate-800 text-slate-300 border-slate-700"
+                              }`}
+                            >
+                              {lead.asignadoAId === currentUser?.id ? "Tú" : lead.asignadoANombre}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-amber-400/80 italic">Sin asignar</span>
+                          )}
+
+                          {currentUser?.rol === "ADMIN" && onAssignLead && (
+                            <select
+                              value={lead.asignadoAId || ""}
+                              onChange={(e) => {
+                                const selected = users.find((u) => u.id === e.target.value);
+                                onAssignLead(
+                                  lead.id,
+                                  e.target.value,
+                                  selected ? selected.nombre : "Sin Asignar"
+                                );
+                              }}
+                              className="bg-slate-900 border border-slate-700 text-slate-300 text-[10px] rounded-lg px-1.5 py-0.5 outline-none hover:border-purple-400 cursor-pointer"
+                              title="Ceder a otro colaborador"
+                            >
+                              <option value="">Ceder...</option>
+                              {users.map((u) => (
+                                <option key={u.id} value={u.id}>
+                                  {u.nombre}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
                       </td>
 
                       {/* Desafío y Propuesta */}

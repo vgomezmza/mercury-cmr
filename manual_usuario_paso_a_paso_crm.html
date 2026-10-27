@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual de Usuario Paso a Paso - CRM Mercury Creation & Design</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm 12mm 12mm 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff !important;
+      line-height: 1.45;
+      font-size: 9pt;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .page {
+      page-break-after: always;
+      position: relative;
+      height: 270mm;
+      max-height: 270mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: 2mm;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    .content-area {
+      flex: 1;
+    }
+
+    /* Encabezados */
+    h1, h2, h3, h4 {
+      color: #090d16;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    h1 {
+      font-size: 21pt;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    h2 {
+      font-size: 13pt;
+      font-weight: 800;
+      border-bottom: 2pt solid #0f172a;
+      padding-bottom: 3.5px;
+      margin-top: 8pt;
+      margin-bottom: 6pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    h3 {
+      font-size: 10pt;
+      font-weight: 700;
+      margin-top: 6pt;
+      margin-bottom: 3pt;
+      color: #0f172a;
+      border-left: 3pt solid #2563eb;
+      padding-left: 6pt;
+    }
+
+    p {
+      margin-bottom: 5pt;
+      text-align: justify;
+      color: #1e293b;
+      font-size: 8.8pt;
+    }
+
+    /* Listas */
+    ol, ul {
+      margin-left: 14pt;
+      margin-bottom: 6pt;
+    }
+
+    li {
+      margin-bottom: 3pt;
+      font-size: 8.8pt;
+      color: #1e293b;
+    }
+
+    /* Tablas */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 5pt 0 7pt 0;
+      font-size: 8.2pt;
+    }
+
+    th, td {
+      border: 1pt solid #cbd5e1;
+      padding: 4pt 5pt;
+      text-align: left;
+      vertical-align: top;
+      color: #1e293b;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 7.8pt;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    /* Wireframes y Diagramas ASCII */
+    .wireframe-box {
+      border: 1.5pt solid #0f172a;
+      background: #f8fafc;
+      padding: 6pt;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 7.6pt;
+      line-height: 1.25;
+      margin: 5pt 0;
+      white-space: pre;
+      overflow: hidden;
+      border-radius: 3pt;
+    }
+
+    .step-badge {
+      display: inline-block;
+      border: 1pt solid #1e293b;
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 7.5pt;
+      padding: 0.5pt 4.5pt;
+      border-radius: 2pt;
+      margin-right: 3pt;
+    }
+
+    /* Cajas de Alerta y Ejemplos */
+    .callout {
+      border: 1pt solid #93c5fd;
+      border-left: 3.5pt solid #2563eb;
+      background: #eff6ff;
+      padding: 5pt 7pt;
+      margin: 5pt 0;
+      font-size: 8.3pt;
+      border-radius: 2pt;
+    }
+
+    .example-box {
+      border: 1.5pt dashed #475569;
+      background: #ffffff;
+      padding: 5pt 7pt;
+      margin: 5pt 0;
+      font-size: 8.3pt;
+      border-radius: 2pt;
+    }
+
+    .urgent-box {
+      border: 1pt solid #fca5a5;
+      border-left: 3.5pt solid #dc2626;
+      background: #fef2f2;
+      padding: 5pt 7pt;
+      margin: 5pt 0;
+      font-size: 8.3pt;
+      border-radius: 2pt;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7pt;
+      margin-bottom: 5pt;
+    }
+
+    .card {
+      border: 1pt solid #cbd5e1;
+      padding: 5pt 6pt;
+      background: #ffffff;
+      border-radius: 2pt;
+    }
+
+    .card h4 {
+      font-size: 8.8pt;
+      font-weight: 800;
+      margin-bottom: 2pt;
+      text-transform: uppercase;
+      border-bottom: 1pt solid #e2e8f0;
+      padding-bottom: 1.5pt;
+      color: #1e293b;
+    }
+
+    /* Encabezado y Pie de Página */
+    .page-header {
+      border-bottom: 1.5pt solid #0f172a;
+      padding-bottom: 2.5pt;
+      margin-bottom: 5pt;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #334155;
+    }
+
+    .footer-note {
+      border-top: 1.5pt solid #0f172a;
+      padding-top: 2.5pt;
+      margin-top: 4pt;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #334155;
+    }
+
+    code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 8.5pt;
+      font-weight: bold;
+      border: 0.5pt solid #cbd5e1;
+      padding: 0 2pt;
+      background: #f1f5f9;
+      border-radius: 2pt;
+    }
+
+    /* Portada */
+    .cover-frame {
+      border: 2.5pt solid #0f172a;
+      height: 100%;
+      padding: 9mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cover-inner {
+      border: 1pt solid #475569;
+      height: 100%;
+      padding: 7mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PÁGINA 1: PORTADA E ÍNDICE DEL MANUAL ==================== -->
+  <div class="page">
+    <div class="cover-frame">
+      <div class="cover-inner">
+        <div>
+          <div style="border: 2pt solid #0f172a; display: inline-block; padding: 4pt 8pt; font-weight: 900; font-size: 13pt; margin-bottom: 8pt; background: #0f172a; color: #ffffff; border-radius: 2pt;">
+            MERCURY CREATION &amp; DESIGN
+          </div>
+          <p style="font-size: 8pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #475569; margin-bottom: 4pt;">
+            Agencia de Transformación Digital • UX/UI &amp; Software a Medida • Mendoza, Argentina
+          </p>
+          <h1 style="font-size: 22pt; line-height: 1.15; margin-bottom: 6pt;">
+            MANUAL OPERATIVO PASO A PASO<br>DEL SISTEMA CRM MERCURYCAD
+          </h1>
+          <p style="font-size: 9.8pt; font-weight: 700; border-bottom: 2pt solid #0f172a; padding-bottom: 5pt; margin-bottom: 8pt; color: #1e293b;">
+            Guía Oficial de Operación Comercial: Desde el Login y Prospección hasta la Carga Inteligente, Seguimiento Multicanal y Cierre de Negociaciones
+          </p>
+          
+          <div class="callout">
+            <strong>DOCUMENTO OPERATIVO COMPLETO:</strong> Este manual detalla de forma secuencial y gráfica los 5 procesos indispensables para la captación, cualificación, presupuestación y cierre de contratos en el mercado mendocino y regional.
+          </div>
+        </div>
+
+        <div>
+          <h2 style="font-size: 11pt; margin-top: 0; margin-bottom: 5pt;">Índice General de Contenidos</h2>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 14%;">Fase / Módulo</th>
+                <th style="width: 74%;">Flujo Operativo Paso a Paso</th>
+                <th style="width: 12%; text-align: center;">Página</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>FASE 1</strong></td>
+                <td><strong>Acceso al Sistema y Seguridad:</strong> Puesta en marcha, conexión PostgreSQL 17, roles RBAC y credenciales demo.</td>
+                <td style="text-align: center; font-weight: bold;">Pág. 2</td>
+              </tr>
+              <tr>
+                <td><strong>FASE 2</strong></td>
+                <td><strong>Trabajar con Posibles Clientes:</strong> Exploración del directorio de 200 prospectos, filtros por industria y auditoría.</td>
+                <td style="text-align: center; font-weight: bold;">Pág. 3</td>
+              </tr>
+              <tr>
+                <td><strong>FASE 3</strong></td>
+                <td><strong>Dar de Alta un Prospecto Nuevo:</strong> Modal de Carga Inteligente, Radar Social Scout, dominios y anti-duplicados.</td>
+                <td style="text-align: center; font-weight: bold;">Pág. 4</td>
+              </tr>
+              <tr>
+                <td><strong>FASE 4</strong></td>
+                <td><strong>Comunicación Multicanal y Seguimiento:</strong> WhatsApp directo, Ficha 360°, Social Hub y Alerta Crítica (+48h).</td>
+                <td style="text-align: center; font-weight: bold;">Pág. 5</td>
+              </tr>
+              <tr>
+                <td><strong>FASE 5</strong></td>
+                <td><strong>Negociación y Cierre de Tratos:</strong> Pipeline Kanban (5 etapas), Cotizador CPQ bimonetario y estado GANADO.</td>
+                <td style="text-align: center; font-weight: bold;">Pág. 6</td>
+              </tr>
+              <tr>
+                <td><strong>APÉNDICE</strong></td>
+                <td><strong>Abonos Recurrentes (MRR) y Proyectos:</strong> Pase a producción Figma/GitHub, contratos y soporte de agencia.</td>
+                <td style="text-align: center; font-weight: bold;">Pág. 7</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="border-top: 1.5pt solid #0f172a; padding-top: 5pt; display: flex; justify-content: space-between; font-size: 7.8pt; font-weight: bold; color: #475569;">
+          <span>SITIO WEB: WWW.MERCURYCAD.COM.AR</span>
+          <span>EMAIL: INFO@MERCURYCAD.COM.AR</span>
+          <span>EDICIÓN: 2026 PRO LOCAL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 2: ACCESO DEL USUARIO ==================== -->
+  <div class="page">
+    <div class="content-area">
+      <div class="page-header">
+        <span>MERCURY CREATION &amp; DESIGN • MANUAL DEL CRM</span>
+        <span>FASE 1 • ACCESO Y SEGURIDAD RBAC</span>
+      </div>
+
+      <h2>Fase 1: Acceso del Usuario y Gestión de Sesión</h2>
+      <p>
+        El CRM opera con una arquitectura moderna sobre <strong>Next.js</strong> y base de datos relacional <strong>PostgreSQL 17</strong> (puerto 5432). El acceso está blindado mediante autenticación basada en roles (RBAC) y protección activa contra ataques de fuerza bruta.
+      </p>
+
+      <h3>1.1. Procedimiento de Inicio y Apertura del CRM</h3>
+      <ol>
+        <li><span class="step-badge">PASO 1</span> Inicia el servicio local ejecutando el archivo <code>iniciar-crm.bat</code> desde la raíz <code>C:\Proyectos\cmr\</code> o mediante la terminal con <code>npm run dev</code>.</li>
+        <li><span class="step-badge">PASO 2</span> Abre tu navegador web en <code>http://localhost:3000</code>. Aparecerá inmediatamente la pantalla de autenticación centralizada.</li>
+        <li><span class="step-badge">PASO 3</span> Verifica en la esquina superior derecha del panel que el indicador de conexión señale <em>"PostgreSQL 17 :5432 (Conectado)"</em> con punto verde activo.</li>
+      </ol>
+
+      <div class="wireframe-box">
++------------------------------------------------------------------------------------------+
+|  [M] MERCURY CREATION & DESIGN | INICIO DE SESIÓN SEGURO                                  |
+|                                                                                          |
+|  Correo Electrónico:  [ victor@mercurycad.com.ar                                       ] |
+|  Contraseña:          [ •••••••••••••••••                                            👁️ ] |
+|  [X] Recordar sesión en este equipo de trabajo                                           |
+|                                                                                          |
+|  [            INGRESAR AL PANEL DE CONTROL COMERCIAL  ➔                                ] |
+|                                                                                          |
+|  ACCESOS DIRECTOS DE PRUEBA / DEMO:                                                      |
+|  [ 👤 Victor Castro (ADMIN) ]  [ 💼 Mariana Soler (COMERCIAL) ]  [ 🛠️ Lucas Benítez (PM) ] |
++------------------------------------------------------------------------------------------+
+      </div>
+
+      <h3>1.2. Perfiles de Colaboradores y Matriz de Permisos (RBAC)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Colaborador</th>
+            <th>Rol en Sistema</th>
+            <th>Correo Corporativo</th>
+            <th>Clave Demo</th>
+            <th>Módulos y Acciones Permitidas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Víctor Castro</strong></td>
+            <td><code>ADMIN</code></td>
+            <td><code>victor@mercurycad.com.ar</code></td>
+            <td><code>mercury2026</code></td>
+            <td>Control total: Administración de usuarios, altas/bajas, canales, finanzas, métricas y directorio.</td>
+          </tr>
+          <tr>
+            <td><strong>Mariana Soler</strong></td>
+            <td><code>COMERCIAL</code></td>
+            <td><code>ventas@mercurycad.com.ar</code></td>
+            <td><code>comercial2026</code></td>
+            <td>Directorio de 200 prospectos, Pipeline Kanban, Cotizador CPQ y Bandeja de Redes (Social Hub).</td>
+          </tr>
+          <tr>
+            <td><strong>Lucas Benítez</strong></td>
+            <td><code>PROJECT_MANAGER</code></td>
+            <td><code>pm@mercurycad.com.ar</code></td>
+            <td><code>pm2026</code></td>
+            <td>Abonos mensuales (MRR), seguimiento de proyectos ganados, accesos a Figma y repositorios GitHub.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>1.3. Mecanismos de Seguridad y Bloqueo Temporal</h3>
+      <div class="callout">
+        <strong>Protección de Fuerza Bruta:</strong> El sistema permite hasta <strong>5 intentos fallidos</strong> de contraseña. Si se supera este límite, la pantalla activa una cuenta regresiva de <strong>30 segundos de bloqueo</strong> antes de permitir nuevos intentos, protegiendo la integridad de la base local.
+      </div>
+      <p>
+        <strong>Opción "Recordar sesión":</strong> Al marcar esta casilla, el navegador preserva el token local para que no tengas que reescribir tus credenciales cada vez que actualices la página.
+      </p>
+    </div>
+
+    <div class="footer-note">
+      <span>MERCURY CREATION &amp; DESIGN • MANUAL DE USUARIO CRM</span>
+      <span>PÁGINA 2 DE 7</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 3: TRABAJAR CON POSIBLES CLIENTES ==================== -->
+  <div class="page">
+    <div class="content-area">
+      <div class="page-header">
+        <span>MERCURY CREATION &amp; DESIGN • MANUAL DEL CRM</span>
+        <span>FASE 2 • TRABAJAR CON POSIBLES CLIENTES</span>
+      </div>
+
+      <h2>Fase 2: Trabajar con los Posibles Clientes</h2>
+      <p>
+        El CRM cuenta con una base curada de <strong>200 prospectos calificados de Mendoza</strong>, abarcando bodegas emblemáticas, empresas vitivinícolas, constructoras, servicios médicos, finanzas, logística y gastronomía.
+      </p>
+
+      <div class="wireframe-box">
++------------------------------------------------------------------------------------------+
+|  DIRECTORIO DE PROSPECTOS (200 EN BASE)                   [ + BUSCAR / NUEVO LEAD ]      |
++------------------------------------------------------------------------------------------+
+|  BUSCADOR: [ Escribe empresa o directivo (ej: Laur, Montemar, Pescarmona)...          🔍 ] |
+|  SERVICIO: [ TODOS LOS SERVICIOS ▼ ]    ETAPA: [ TODAS LAS ETAPAS ▼ ]  (15 por página)   |
++------------------------------------------------------------------------------------------+
+|  EMPRESA / CONTACTO        SERVICIO       PROPUESTA MERCURY      AUDITORÍA  VALOR ACCIONES|
+|  Bodega Alturas de Mendoza UX/UI & Web    Rediseño Club de Vinos [✓ Verif.] $2,400 [Ficha]|
+|  Planta Uno Gastronomía    Software/App   Portal y Reservas      [✓ Verif.] $4,500 [Ficha]|
+|  Montemar C.F.             Desarrollo Web Simulador de Créditos  [✓ Verif.] $6,800 [Ficha]|
+|  Hipercerámico             E-Commerce     Catálogo con Stock     [! Revisar]$5,200 [Ficha]|
++------------------------------------------------------------------------------------------+
+      </div>
+
+      <h3>2.1. Navegación, Búsqueda y Filtrado Inteligente</h3>
+      <ol>
+        <li><span class="step-badge">PASO 1</span> Haz clic en la pestaña <strong>"Directorio Prospectos"</strong> en el menú superior.</li>
+        <li><span class="step-badge">PASO 2</span> <strong>Búsqueda en Tiempo Real:</strong> Escribe en el buscador cualquier término clave: nombre de la empresa (ej: <em>"Laur", "Zuccardi", "Montemar"</em>), apellido del decisor (ej: <em>"Pescarmona", "Guardia"</em>) o localidad. La tabla filtra instantáneamente.</li>
+        <li><span class="step-badge">PASO 3</span> <strong>Filtro por Servicio Solicitado:</strong> Utiliza el selector desplegable para aislar cuentas según el tipo de servicio:
+          <ul>
+            <li><code>Diseño UX/UI</code>: Proyectos de prototipado interactivo en Figma y rediseño de interfaz.</li>
+            <li><code>Desarrollo Web</code>: Maquetación responsive, velocidad de carga y plataformas Next.js.</li>
+            <li><code>Software a Medida</code>: Sistemas internos, portales de clientes y automatizaciones.</li>
+            <li><code>Google &amp; Meta Ads</code>: Campañas de captación y pauta publicitaria digital.</li>
+          </ul>
+        </li>
+        <li><span class="step-badge">PASO 4</span> <strong>Filtro por Etapa del Embudo:</strong> Consulta rápidamente prospectos en estado <em>NUEVO, EN RELEVAMIENTO, PROPUESTA ENVIADA</em> o <em>EN NEGOCIACIÓN</em>.</li>
+      </ol>
+
+      <h3>2.2. Lectura de Diagnósticos y Calidad del Dato</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Columna "Desafío &amp; Propuesta"</h4>
+          <p>
+            Resume el dolor comercial detectado en la empresa durante la auditoría inicial de Mercury CAD (ej. falta de compra móvil, ausencia de automatizaciones o lentitud web).
+          </p>
+        </div>
+        <div class="card">
+          <h4>Columna "Auditoría Redes"</h4>
+          <p>
+            Indica si el decisor y el perfil de LinkedIn/Instagram han sido auditados (<code>Verificado</code> con escudo verde, <code>Por Corregir</code> con alerta naranja o <code>Sin Auditar</code>).
+          </p>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <strong>Ejemplo Práctico de Diagnóstico en Base:</strong><br>
+        <em>"Bodega Alturas de Mendoza • Decisor: Julián Albarracín (Gerente Comercial) • Desafío: Su tienda web actual tiene una tasa de abandono del 68% en el carrito de compras. Propuesta: Rediseño UX/UI en Figma y checkout simplificado en 2 pasos."</em>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <span>MERCURY CREATION &amp; DESIGN • MANUAL DE USUARIO CRM</span>
+      <span>PÁGINA 3 DE 7</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 4: DAR DE ALTA UN NUEVO PROSPECTO ==================== -->
+  <div class="page">
+    <div class="content-area">
+      <div class="page-header">
+        <span>MERCURY CREATION &amp; DESIGN • MANUAL DEL CRM</span>
+        <span>FASE 3 • ALTA DE NUEVO PROSPECTO</span>
+      </div>
+
+      <h2>Fase 3: Dar de Alta un Posible Cliente Nuevo</h2>
+      <p>
+        El CRM cuenta con el módulo exclusivo de <strong>Carga Inteligente con Radar Social Scout</strong>, diseñado para registrar nuevos clientes reduciendo el tiempo de carga en un 80% mediante autocompletado y validación de duplicados.
+      </p>
+
+      <div class="wireframe-box">
++------------------------------------------------------------------------------------------+
+|  CARGA INTELIGENTE DE NUEVO PROSPECTO (RADAR SOCIAL SCOUT)                      [ X ]     |
++------------------------------------------------------------------------------------------+
+|  EMPRESA: [ Bodega Don Cristóbal           ]  DECISOR: [ Juan Pablo Cristóbal          ] |
+|  EMAIL:   [ jcristobal@doncristobal.com.ar ]  TELÉFONO:[ +54 261 488-3320              ] |
+|  --------------------------------------------------------------------------------------  |
+|  RADAR SOCIAL SCOUT EN VIVO:                                                             |
+|  * Dominio sugerido: [ @doncristobal.com.ar (Aplicar) ]   [ @doncristobalwines.com ]     |
+|  * Handle LinkedIn:  [ @bodega-don-cristobal (Vincular) ] [ 🌐 Buscar Perfil Decisor ]   |
+|  * Handle Instagram: [ @doncristobalwines    (Vincular) ]                                |
+|  [ ⚡ AUTOCOMPLETAR TODO CON REDES SUGERIDAS ]                                            |
+|  --------------------------------------------------------------------------------------  |
+|  SERVICIO: [ Diseño UX/UI ▼ ]  VALOR: [$ 2,500 USD]  PRIORIDAD: [ Alta ▼ ]               |
+|  NOTAS:    [ Interés en rediseñar su web para exportación a Brasil y EE.UU.            ] |
+|  [ CANCELAR ]                                [ 💾 GUARDAR NUEVO PROSPECTO EN CRM ]       |
++------------------------------------------------------------------------------------------+
+      </div>
+
+      <h3>3.1. Procedimiento de Alta Paso a Paso</h3>
+      <ol>
+        <li><span class="step-badge">PASO 1</span> En el Directorio de Prospectos, haz clic en el botón degradado azul/celeste <strong>"+ Buscar / Nuevo Lead"</strong>.</li>
+        <li><span class="step-badge">PASO 2</span> <strong>Ingreso de Datos Principales:</strong> Escribe el <em>Nombre de la Empresa</em> y el <em>Nombre del Decisor Comercial</em> (ej. Gerente General, Director de Marketing o Dueño).</li>
+        <li><span class="step-badge">PASO 3</span> <strong>Activación Automática del Radar Social Scout:</strong> Al escribir la empresa, el motor analiza el nombre y despliega de inmediato:
+          <ul>
+            <li>Dominios web corporativos posibles (ej. <code>@empresa.com.ar</code>).</li>
+            <li>Identificador oficial en LinkedIn y sugerencia de búsqueda del directivo.</li>
+            <li>Identificador tentativo de Instagram para cuentas comerciales.</li>
+          </ul>
+        </li>
+        <li><span class="step-badge">PASO 4</span> <strong>Acción en 1 Clic (Autocompletar Todo):</strong> Pulsa <em>"⚡ Autocompletar todo con redes sugeridas"</em> o usa los botones individuales para aplicar el correo institucional limpio en segundos.</li>
+        <li><span class="step-badge">PASO 5</span> <strong>Control Anti-Duplicados:</strong> Si el nombre ingresado coincide con un prospecto ya existente en la base de datos de Mendoza, el modal mostrará una advertencia con enlace a la ficha existente para no duplicar gestiones.</li>
+        <li><span class="step-badge">PASO 6</span> <strong>Parámetros Comerciales:</strong> Selecciona el <em>Servicio de Interés</em>, el <em>Presupuesto Estimado</em> (por defecto $2,500 USD) y el nivel de prioridad (<em>Alta, Media, Baja</em>).</li>
+        <li><span class="step-badge">PASO 7</span> Haz clic en <strong>"Guardar Nuevo Prospecto en CRM"</strong>. El nuevo lead se incorporará automáticamente en estado <strong>NUEVO</strong> en el Directorio y en la primera columna del Pipeline Kanban.</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Beneficio Operativo:</strong> No necesitas abrir pestañas externas para adivinar el correo corporativo o el handle de la empresa; el Radar Social Scout estructura los canales listos para auditar.
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <span>MERCURY CREATION &amp; DESIGN • MANUAL DE USUARIO CRM</span>
+      <span>PÁGINA 4 DE 7</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 5: COMUNICACIÓN Y SEGUIMIENTO ==================== -->
+  <div class="page">
+    <div class="content-area">
+      <div class="page-header">
+        <span>MERCURY CREATION &amp; DESIGN • MANUAL DEL CRM</span>
+        <span>FASE 4 • COMUNICACIÓN Y SEGUIMIENTO</span>
+      </div>
+
+      <h2>Fase 4: Realizar la Comunicación y Hacer el Seguimiento</h2>
+      <p>
+        La efectividad comercial depende de la rapidez de contacto y la omnicanalidad. El CRM integra herramientas de contacto directo, historial de notas, auditoría en redes y alertas de inactividad.
+      </p>
+
+      <div class="wireframe-box">
++------------------------------------------------------------------------------------------+
+|  FICHA 360° DEL PROSPECTO: Bodega Alturas de Mendoza                    [ X ]            |
+|  Decisor: Julián Albarracín • Correo: jalbarracin@bodegaalturas.com.ar • +54 261 455-8910 |
++------------------------------------------------------------------------------------------+
+|  PESTAÑAS: [ 🏢 FICHA GENERAL ]   [ 🛡️ COMPROBAR REDES (95 pts) ]   [ ✏️ EDITAR CONTACTO ] |
+|                                                                                          |
+|  [ 💬 Contactar por WhatsApp ]   [ ✉️ Enviar Correo Oficial ]   [ 💲 Ir a Cotizador CPQ ]  |
+|                                                                                          |
+|  AUDITORÍA EN 1 CLIC:                                                                    |
+|  [ in LinkedIn Empresa ]  [ 👤 Buscar Decisor ]  [ 🌐 Web Oficial ]  [ 🔍 CUIT en Google ]|
+|                                                                                          |
+|  MOVER ETAPA EN PIPELINE:                                                                |
+|  [ NUEVO ]  ➔  [ RELEVAMIENTO ]  ➔  [ PROPUESTA ENVIADA ]  ➔  [ EN NEGOCIACIÓN ]  ➔ [GANADO]|
++------------------------------------------------------------------------------------------+
+      </div>
+
+      <h3>4.1. Canales Directos de Comunicación</h3>
+      <ul>
+        <li><strong>Contacto por WhatsApp en 1 Clic:</strong> Al hacer clic en el botón verde de WhatsApp, se abre la aplicación con el número ya formateado internacionalmente (+54) y una plantilla cordial prediseñada de presentación institucional de Mercury CAD.</li>
+        <li><strong>Correo Institucional Corporativo:</strong> El enlace de correo abre tu cliente de correo (Thunderbird, Outlook o webmail) con copia al historial del prospecto.</li>
+        <li><strong>Pestaña "Comprobar Redes &amp; Datos":</strong> Permite auditar en tiempo real si el decisor sigue en la empresa, validar su perfil de LinkedIn y revisar las últimas noticias o estado societario en Google con un solo clic.</li>
+      </ul>
+
+      <h3>4.2. Protocolo de Atención para la Alerta Crítica (+48h Sin Contacto)</h3>
+      <div class="urgent-box">
+        <strong>⚠️ ALERTA DE INACTIVIDAD (+48 HORAS):</strong> Cuando un prospecto no recibe interacción o actualización en más de 48 horas hábiles, su tarjeta en el Kanban se resalta con borde rojo intermitente y etiqueta de urgencia <code>+48h</code>.
+      </div>
+      <ol>
+        <li><span class="step-badge">PASO 1</span> Abre la tarjeta del prospecto con alerta.</li>
+        <li><span class="step-badge">PASO 2</span> Envía mensaje de reactivación comercial: <em>"Estimado [Nombre], te escribo desde Mercury CAD para consultar si tuvieron oportunidad de revisar el diagnóstico técnico que preparamos para [Empresa]. ¿Les gustaría que coordinemos 15 minutos de videollamada para resolver dudas?"</em></li>
+        <li><span class="step-badge">PASO 3</span> Actualiza las notas del contacto con la respuesta recibida y avanza la etapa correspondiente para apagar la alerta de urgencia.</li>
+      </ol>
+
+      <h3>4.3. Social Hub: Recepción de Consultas Entrantes</h3>
+      <p>
+        Si el prospecto ingresó por una campaña publicitaria en <strong>Instagram DM, Facebook Ads, LinkedIn B2B o X</strong>, la consulta ingresa en la pestaña <strong>"Social Hub"</strong>. El sistema clasifica el sentimiento en <em>"Interés Alto"</em> o <em>"Neutro"</em> y te permite convertir la consulta en un Lead del Pipeline pulsando <strong>"Convertir en Lead"</strong> en 1 segundo.
+      </p>
+    </div>
+
+    <div class="footer-note">
+      <span>MERCURY CREATION &amp; DESIGN • MANUAL DE USUARIO CRM</span>
+      <span>PÁGINA 5 DE 7</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 6: NEGOCIACIÓN Y CIERRE ==================== -->
+  <div class="page">
+    <div class="content-area">
+      <div class="page-header">
+        <span>MERCURY CREATION &amp; DESIGN • MANUAL DEL CRM</span>
+        <span>FASE 5 • NEGOCIACIÓN Y CIERRE DE TRATOS</span>
+      </div>
+
+      <h2>Fase 5: Negociación, Presupuestación y Cierre de Tratos</h2>
+      <p>
+        El proceso comercial culmina con el envío de una propuesta económica atractiva y el cierre exitoso del contrato mediante el <strong>Pipeline Kanban</strong> y el <strong>Cotizador CPQ</strong>.
+      </p>
+
+      <div class="wireframe-box">
++------------------+------------------+------------------+------------------+------------------+
+| NUEVO            | RELEVAMIENTO     | PROPUESTA ENV.   | EN NEGOCIACION   | GANADO (CERRADO) |
+| Total: $12,400   | Total: $28,900   | Total: $45,200   | Total: $34,800   | Total: $82,000   |
++------------------+------------------+------------------+------------------+------------------+
+| [Bodega Alturas] | [Planta Uno]     | [Montemar C.F.]  | [Hipercerámico]  | [Anaia Wines]    |
+| $2,400 - UX/UI   | $4,500 - Web Dev | $6,800 - Sofware | $5,200 - Catálogo| $9,400 - Enotur. |
+| [Mover Etapa ➔]  | [Cotizar en CPQ] | [Ver Propuesta]  | [Cerrar Trato ✅]| [ABONO ACTIVO 💎]|
++------------------+------------------+------------------+------------------+------------------+
+      </div>
+
+      <h3>5.1. El Embudo de Ventas: Las 5 Etapas del Pipeline</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Etapa</th>
+            <th>Objetivo Comercial</th>
+            <th>Acción Concreta en el CRM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. NUEVO</strong></td>
+            <td>Contacto rápido antes de 2 horas.</td>
+            <td>Llamada o WhatsApp inicial. Calificar interés real.</td>
+          </tr>
+          <tr>
+            <td><strong>2. RELEVAMIENTO</strong></td>
+            <td>Diagnóstico técnico de necesidades.</td>
+            <td>Reunión de 30 min (videollamada). Definir pantallas y alcance.</td>
+          </tr>
+          <tr>
+            <td><strong>3. PROPUESTA ENVIADA</strong></td>
+            <td>Presentación formal de números.</td>
+            <td>Armar cotización en CPQ, exportar resumen y enviar al cliente.</td>
+          </tr>
+          <tr>
+            <td><strong>4. EN NEGOCIACIÓN</strong></td>
+            <td>Ajuste de plazos, formas de pago e hitos.</td>
+            <td>Definición de moneda (USD/ARS), anticipo (50%) y fecha de entrega.</td>
+          </tr>
+          <tr>
+            <td><strong>5. GANADO (CIERRE)</strong></td>
+            <td>Firma y cobro de anticipo inicial.</td>
+            <td>Pulsar <strong>"Cerrar Trato / Ganado"</strong>. Pasa a producción y soporte.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>5.2. Uso del Cotizador Inteligente CPQ (*Configure, Price, Quote*)</h3>
+      <ol>
+        <li><span class="step-badge">PASO 1</span> Pulsa <strong>"Cotizar en CPQ"</strong> desde la ficha del prospecto o la barra superior.</li>
+        <li><span class="step-badge">PASO 2</span> <strong>Configuración del Proyecto:</strong>
+          <ul>
+            <li><em>Diseño UX/UI:</em> Establece el número de pantallas Figma (ej. 12 pantallas = $1,440 USD) y activa el interruptor de prototipo interactivo (+$450 USD).</li>
+            <li><em>Desarrollo Técnico:</em> Selecciona el tipo de desarrollo (Landing page $650, Web Corporativa $1,600, E-commerce $2,800 o Software a medida $4,500) y base de datos (+$750 USD).</li>
+            <li><em>Campañas Ads:</em> Añade presupuesto de pauta si requiere tráfico inmediato (fee de gestión del 15%).</li>
+            <li><em>Abono Mensual (MRR):</em> Incluye soporte continuo (Básico $250/m, Proactivo $450/m, Enterprise $850/m).</li>
+          </ul>
+        </li>
+        <li><span class="step-badge">PASO 3</span> <strong>Resumen Bimonetario Instantáneo:</strong> El sistema totaliza el proyecto en <strong>USD</strong> y su equivalente en <strong>Pesos Argentinos (ARS)</strong> al tipo de cambio de referencia ($1,250 ARS).</li>
+        <li><span class="step-badge">PASO 4</span> Haz clic en <strong>"Copiar Resumen de Propuesta"</strong> para obtener la redacción formal lista para pegar en un mensaje o correo comercial.</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Paso Final de Cierre (Ganado):</strong> Al confirmar el anticipo bancario, mueve el lead a la columna <strong>GANADO</strong>. El sistema registrará el valor en el monto total cerrado del mes y transferirá la cuenta a la sección de proyectos activos.
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <span>MERCURY CREATION &amp; DESIGN • MANUAL DE USUARIO CRM</span>
+      <span>PÁGINA 6 DE 7</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 7: APÉNDICE Y BUENAS PRÁCTICAS ==================== -->
+  <div class="page">
+    <div class="content-area">
+      <div class="page-header">
+        <span>MERCURY CREATION &amp; DESIGN • MANUAL DEL CRM</span>
+        <span>APÉNDICE • ABONOS, SOPORTE Y BUENAS PRÁCTICAS</span>
+      </div>
+
+      <h2>Apéndice: Abonos Mensuales (MRR) y Buenas Prácticas</h2>
+      <p>
+        Una negociación cerrada con éxito da inicio a la relación de largo plazo con el cliente a través de abonos recurrentes mensuales y la ejecución técnica impecable de los entregables pactados.
+      </p>
+
+      <h3>A.1. Gestión de Abonos Recurrentes y Hitos en "Abonos &amp; Proyectos"</h3>
+      <ol>
+        <li><span class="step-badge">PASO 1</span> Ingresa a la pestaña <strong>"Abonos &amp; Proyectos"</strong> del menú superior.</li>
+        <li><span class="step-badge">PASO 2</span> <strong>Supervisión del MRR (*Monthly Recurring Revenue*):</strong> El panel muestra el ingreso recurrente mensual asegurado (ej. $4,850 USD/mes) que financia los costos fijos de la agencia.</li>
+        <li><span class="step-badge">PASO 3</span> <strong>Control de Cobranzas:</strong> Monitorea los días de facturación (día 1 o 5 de cada mes). Si una cuenta tiene retraso, comunícate cordialmente antes del día 10.</li>
+        <li><span class="step-badge">PASO 4</span> <strong>Enlaces a Entregables Técnicos:</strong> Desde cada tarjeta de proyecto ganado, accede directamente al archivo de diseño en <code>Figma</code> o al entorno de desarrollo en <code>GitHub</code> para mantener al cliente informado del avance.</li>
+      </ol>
+
+      <div class="wireframe-box">
++------------------------------------------------------------------------------------------+
+|  INGRESOS MENSUALES RECURRENTES (MRR): $4,850 USD/mes     PROYECCIÓN ANUAL: $58,200 USD   |
++------------------------------------------------------------------------------------------+
+|  PROYECTOS GANADOS EN PRODUCCIÓN:                                                        |
+|  * Proyecto: Rediseño Enoturismo Bodega Alturas | Avance: [██████████░░░░] 75%           |
+|    Hitos: [✓] Wireframes  [✓] Prototipo Figma  [✓] Frontend  [ ] QA  [ ] Producción      |
+|    Enlaces: [ 🎨 Ver Prototipo Figma ]    [ 💻 Ver Código en GitHub ]                    |
+|                                                                                          |
+|  * Abono de Mantenimiento Activo: Bodega Alturas ($350 USD/mes) - Cobro día 1 de cada mes|
++------------------------------------------------------------------------------------------+
+      </div>
+
+      <h3>A.2. Decálogo de Buenas Prácticas para el Ejecutivo Comercial</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Regla de Oro</th>
+            <th>Criterio Operativo Mercury CAD</th>
+            <th>Impacto en Cierre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Respuesta en &lt; 2h</strong></td>
+            <td>Todo prospecto nuevo debe ser contactado antes de transcurridas 2 horas laborales.</td>
+            <td>Multiplica por 4x la tasa de conversión.</td>
+          </tr>
+          <tr>
+            <td><strong>Auditoría Previa</strong></td>
+            <td>Antes de enviar un mensaje, revisa su sitio web actual y perfil en LinkedIn en la ficha.</td>
+            <td>El cliente percibe interés y preparación profesional.</td>
+          </tr>
+          <tr>
+            <td><strong>Uso de CPQ</strong></td>
+            <td>No presupuestar montos al azar; utiliza siempre los módulos y horas calculadas por el CPQ.</td>
+            <td>Asegura un margen de rentabilidad neto superior al 30%.</td>
+          </tr>
+          <tr>
+            <td><strong>Cero Alertas +48h</strong></td>
+            <td>Ningún prospecto activo debe superar las 48 horas sin seguimiento documentado en el CRM.</td>
+            <td>Evita que el trato se enfríe o sea captado por otra agencia.</td>
+          </tr>
+          <tr>
+            <td><strong>Ofrecer Abono</strong></td>
+            <td>Todo presupuesto de diseño o web debe incluir una opción de mantenimiento mensual.</td>
+            <td>Garantiza estabilidad financiera y retención de cuentas.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="example-box">
+        <strong>Mesa de Ayuda y Canales Oficiales:</strong><br>
+        Mercury Creation &amp; Design • Mendoza, Argentina<br>
+        Sitio Web: <code>www.mercurycad.com.ar</code> • Correo Soporte: <code>soporte@mercurycad.com.ar</code> • Tel: +54 261 400-0000
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <span>MERCURY CREATION &amp; DESIGN • MANUAL DE USUARIO CRM</span>
+      <span>PÁGINA 7 DE 7</span>
+    </div>
+  </div>
+
+</body>
+</html>

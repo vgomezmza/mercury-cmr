@@ -57,7 +57,37 @@ export const INITIAL_USERS: User[] = [
   },
 ];
 
-export const INITIAL_LEADS: Lead[] = importedLeads as Lead[];
+export const INITIAL_LEADS: Lead[] = (importedLeads as Lead[]).map((lead, idx) => {
+  if (idx % 3 === 0) {
+    return {
+      ...lead,
+      asignadoAId: "usr-2",
+      asignadoANombre: "Mariana Soler",
+      creadoPorId: idx % 6 === 0 ? "usr-2" : "usr-1",
+    };
+  } else if (idx % 3 === 1) {
+    return {
+      ...lead,
+      asignadoAId: "usr-4",
+      asignadoANombre: "Sofía Rossi",
+      creadoPorId: idx % 6 === 1 ? "usr-4" : "usr-1",
+    };
+  } else if (idx % 6 === 2) {
+    return {
+      ...lead,
+      asignadoAId: "usr-3",
+      asignadoANombre: "Lucas Benítez",
+      creadoPorId: "usr-1",
+    };
+  } else {
+    return {
+      ...lead,
+      asignadoAId: "usr-1",
+      asignadoANombre: "Víctor (Director)",
+      creadoPorId: "usr-1",
+    };
+  }
+});
 
 export const INITIAL_SOCIAL_FEED: SocialInteraction[] = [];
 

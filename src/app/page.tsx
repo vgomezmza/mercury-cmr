@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Header } from "../components/Header";
 import { PipelineKanban } from "../components/PipelineKanban";
 import { SocialHub } from "../components/SocialHub";
@@ -13,6 +13,7 @@ import { ChannelSettings } from "../components/ChannelSettings";
 import { OpinionsMonitor } from "../components/OpinionsMonitor";
 import { LoginScreen } from "../components/LoginScreen";
 import { UserManagement } from "../components/UserManagement";
+import { Dashboard } from "../components/Dashboard";
 import {
   INITIAL_LEADS,
   INITIAL_SOCIAL_FEED,
@@ -23,7 +24,7 @@ import {
   INITIAL_OPINIONS,
   INITIAL_USERS,
 } from "../data/initialData";
-import {
+import type {
   Lead,
   LeadStatus,
   SocialInteraction,
@@ -46,6 +47,7 @@ import {
   Star,
   Mail,
   Users as UsersIcon,
+  LayoutDashboard,
 } from "lucide-react";
 
 export default function Home() {
@@ -106,6 +108,7 @@ export default function Home() {
 
   // Main navigation tabs
   type TabType =
+    | "dashboard"
     | "prospects"
     | "pipeline"
     | "opinions"
@@ -115,7 +118,8 @@ export default function Home() {
     | "settings"
     | "users";
 
-  const [activeTab, setActiveTab] = useState<TabType>("prospects");
+  const [activeTab, setActiveTab] = useState<TabType>("dashboard");
+  const [adminFilterUserId, setAdminFilterUserId] = useState<string>("ALL");
 
   const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
   const [socialFeed, setSocialFeed] = useState<SocialInteraction[]>(INITIAL_SOCIAL_FEED);
@@ -197,6 +201,21 @@ export default function Home() {
     showToast(`Nuevo lead ingresado: ${newLead.nombre} (${newLead.empresa})`);
   };
 
+  const handleAssignLead = (leadId: string, assignedUserId: string, assignedUserName: string) => {
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === leadId
+          ? {
+              ...l,
+              asignadoAId: assignedUserId || undefined,
+              asignadoANombre: assignedUserName !== "Sin Asignar" ? assignedUserName : undefined,
+            }
+          : l
+      )
+    );
+    showToast(`Cliente asignado a ${assignedUserName}.`);
+  };
+
   // Social feed actions
   const handleConvertToLead = (interaction: SocialInteraction) => {
     const newLead: Lead = {
@@ -256,19 +275,38 @@ export default function Home() {
     return <LoginScreen users={users} onLogin={handleLogin} />;
   }
 
-  // Filter leads by search query
-  const searchedLeads = leads.filter(
-    (l) =>
-      l.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.empresa.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.origen.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      l.notas.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter leads visible to the user based on RBAC & assignment
+  const visibleLeadsForUser = useMemo(() => {
+    if (!currentUser) return [];
+    if (currentUser.rol === "ADMIN") {
+      if (adminFilterUserId === "ALL") return leads;
+      if (adminFilterUserId === "UNASSIGNED") return leads.filter((l) => !l.asignadoAId);
+      return leads.filter((l) => l.asignadoAId === adminFilterUserId);
+    }
+    // Commercial and PM: only their own created or assigned to them
+    return leads.filter(
+      (l) => l.asignadoAId === currentUser.id || l.creadoPorId === currentUser.id
+    );
+  }, [leads, currentUser, adminFilterUserId]);
 
-  const totalPipelineUsd = leads.reduce(
-    (acc, curr) => acc + (curr.valorEstimado || 0),
-    0
-  );
+  // Filter leads by search query
+  const searchedLeads = useMemo(() => {
+    return visibleLeadsForUser.filter(
+      (l) =>
+        l.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.empresa.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.origen.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.notas.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [visibleLeadsForUser, searchQuery]);
+
+  const totalPipelineUsd = useMemo(() => {
+    return visibleLeadsForUser.reduce(
+      (acc, curr) => acc + (curr.valorEstimado || 0),
+      0
+    );
+  }, [visibleLeadsForUser]);
+
   const mrrTotalUsd = retainers.reduce((acc, curr) => acc + curr.cuotaMensual, 0);
 
   const pendingOpinionsCount = opinions.filter((o) => o.estado === "PENDIENTE").length;
@@ -276,15 +314,21 @@ export default function Home() {
   // Filter navigation tabs by User Role (RBAC)
   const allTabs = [
     {
+      id: "dashboard",
+      label: "Inicio / Tablero",
+      icon: LayoutDashboard,
+      roles: ["ADMIN", "COMERCIAL", "PROJECT_MANAGER"],
+    },
+    {
       id: "prospects",
-      label: "Directorio Prospectos",
+      label: currentUser?.rol === "ADMIN" ? "Directorio Prospectos" : "Mis Clientes",
       icon: Building2,
-      badge: leads.length,
+      badge: visibleLeadsForUser.length,
       roles: ["ADMIN", "COMERCIAL", "PROJECT_MANAGER"],
     },
     {
       id: "pipeline",
-      label: "Pipeline Kanban",
+      label: currentUser?.rol === "ADMIN" ? "Pipeline Kanban" : "Mi Pipeline",
       icon: Kanban,
       roles: ["ADMIN", "COMERCIAL", "PROJECT_MANAGER"],
     },
@@ -297,7 +341,7 @@ export default function Home() {
     },
     {
       id: "social",
-      label: "Social Hub (Redes)",
+      label: "Social Hub",
       icon: Share2,
       badge: socialFeed.filter((s) => !s.respondido).length,
       roles: ["ADMIN", "COMERCIAL"],
@@ -404,6 +448,20 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+        {activeTab === "dashboard" && currentUser && (
+          <Dashboard
+            currentUser={currentUser}
+            users={users}
+            leads={leads}
+            onOpenNewLead={() => setIsNewLeadOpen(true)}
+            onSelectLead={(lead) => setSelectedLead(lead)}
+            onNavigateTab={(tabId) => setActiveTab(tabId as TabType)}
+            onAssignLead={handleAssignLead}
+            adminFilterUserId={adminFilterUserId}
+            setAdminFilterUserId={setAdminFilterUserId}
+          />
+        )}
+
         {activeTab === "prospects" && (
           <ProspectsDirectory
             leads={searchedLeads}
@@ -413,6 +471,9 @@ export default function Home() {
               setActiveTab("quotes");
             }}
             onOpenNewLead={() => setIsNewLeadOpen(true)}
+            currentUser={currentUser}
+            users={users}
+            onAssignLead={handleAssignLead}
           />
         )}
 
@@ -483,6 +544,8 @@ export default function Home() {
         onClose={() => setIsNewLeadOpen(false)}
         onSaveLead={handleSaveNewLead}
         existingLeads={leads}
+        currentUser={currentUser}
+        users={users}
       />
 
       <LeadDetailModal
@@ -493,6 +556,9 @@ export default function Home() {
         onGoToQuote={(lead) => {
           setActiveTab("quotes");
         }}
+        currentUser={currentUser}
+        users={users}
+        onAssignLead={handleAssignLead}
       />
     </div>
   );

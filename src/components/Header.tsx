@@ -69,17 +69,23 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </h1>
             </div>
-            <p className="text-xs text-slate-400 flex items-center gap-2">
-              <span className="flex items-center gap-1 text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                PostgreSQL 17 :5432
-              </span>
-              <span className="text-slate-600">•</span>
-              <span className="flex items-center gap-1 text-cyan-400">
-                <Radio className="w-3 h-3 animate-spin" />
-                Omnicanal (Meta, IG, LinkedIn, X)
-              </span>
-            </p>
+            {currentUser?.rol === "ADMIN" ? (
+              <p className="text-xs text-slate-400 flex items-center gap-2">
+                <span className="flex items-center gap-1 text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  PostgreSQL 17 :5432
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="flex items-center gap-1 text-cyan-400">
+                  <Radio className="w-3 h-3 animate-spin" />
+                  Omnicanal
+                </span>
+              </p>
+            ) : (
+              <p className="text-xs text-slate-400">
+                Plataforma de Gestión Comercial &amp; Cartera de Clientes
+              </p>
+            )}
           </div>
         </div>
 
