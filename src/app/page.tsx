@@ -534,6 +534,8 @@ export default function Home() {
             onUpdateUser={handleUpdateUser}
             onDeleteUser={handleDeleteUser}
             currentUser={currentUser}
+            leads={leads}
+            onAssignLead={handleAssignLead}
           />
         )}
       </main>
