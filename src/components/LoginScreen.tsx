@@ -147,22 +147,64 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
             </span>
           </div>
 
-          {errorMessage && (
-            <div className="mb-5 p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
+          {/* Quick Profile Login Chips */}
+          <div className="mb-6 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              Acceso Rápido con 1 Clic (Selecciona tu Perfil):
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("victor@mercurycad.com.ar");
+                  setPassword("mercury2026");
+                  const victor = users.find((u) => u.email === "victor@mercurycad.com.ar");
+                  if (victor) onLogin(victor, true);
+                }}
+                className="p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 hover:border-purple-400 text-left transition-all group"
+              >
+                <div className="flex items-center gap-1.5 text-xs font-black text-purple-200 group-hover:text-white">
+                  <span>👑 Víctor</span>
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-900 border border-purple-500/30 text-purple-300">ADMIN</span>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-0.5">Acceso a Menú Lateral &amp; Crear Usuarios</div>
+              </button>
 
-          {lockoutRemaining > 0 && (
-            <div className="mb-5 p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs flex items-center gap-2.5">
-              <Clock className="w-4 h-4 text-amber-400 shrink-0 animate-spin" />
-              <span>
-                Bloqueo de seguridad activo: Reintenta en{" "}
-                <strong>{lockoutRemaining} segundos</strong>.
-              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("ventas@mercurycad.com.ar");
+                  setPassword("comercial2026");
+                  const mariana = users.find((u) => u.email === "ventas@mercurycad.com.ar");
+                  if (mariana) onLogin(mariana, true);
+                }}
+                className="p-2.5 rounded-xl bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/40 hover:border-blue-400 text-left transition-all group"
+              >
+                <div className="flex items-center gap-1.5 text-xs font-black text-blue-200 group-hover:text-white">
+                  <span>💼 Mariana</span>
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-900 border border-blue-500/30 text-blue-300">VENTAS</span>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-0.5">Cartera de Clientes &amp; Pipeline</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("pm@mercurycad.com.ar");
+                  setPassword("pm2026");
+                  const lucas = users.find((u) => u.email === "pm@mercurycad.com.ar");
+                  if (lucas) onLogin(lucas, true);
+                }}
+                className="p-2.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 hover:border-emerald-400 text-left transition-all group"
+              >
+                <div className="flex items-center gap-1.5 text-xs font-black text-emerald-200 group-hover:text-white">
+                  <span>🚀 Lucas</span>
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-900 border border-emerald-500/30 text-emerald-300">PM</span>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-0.5">Proyectos &amp; Abonos Activos</div>
+              </button>
             </div>
-          )}
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

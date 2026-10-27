@@ -410,7 +410,7 @@ export default function Home() {
       label: "Gestión de Usuarios",
       icon: UsersIcon,
       badge: users.filter((u) => u.activo).length,
-      roles: ["ADMIN"],
+      roles: ["ADMIN", "COMERCIAL", "PROJECT_MANAGER"],
     },
   ];
 
@@ -433,6 +433,7 @@ export default function Home() {
       {/* Main Header with User Profile Badge & Logout */}
       <Header
         onOpenNewLead={() => setIsNewLeadOpen(true)}
+        onOpenUsers={() => setActiveTab("users")}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         leadsCount={leads.length}
@@ -583,15 +584,45 @@ export default function Home() {
         )}
 
         {activeTab === "users" && currentUser && (
-          <UserManagement
-            users={users}
-            onAddUser={handleAddUser}
-            onUpdateUser={handleUpdateUser}
-            onDeleteUser={handleDeleteUser}
-            currentUser={currentUser}
-            leads={leads}
-            onAssignLead={handleAssignLead}
-          />
+          <div className="space-y-4">
+            {currentUser.rol !== "ADMIN" && (
+              <div className="p-4 rounded-2xl bg-purple-950/60 border border-purple-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xl animate-in slide-in-from-top-2">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center font-bold text-sm">
+                    👑
+                  </span>
+                  <div>
+                    <strong className="text-white block text-xs">Acceso en Modo Lectura ({currentUser.nombre} - {currentUser.rol})</strong>
+                    <span className="text-slate-300 text-[11px]">
+                      Para registrar nuevos usuarios, editar permisos RBAC o cambiar contraseñas, debes ingresar como Administrador.
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const victor = users.find((u) => u.email === "victor@mercurycad.com.ar");
+                    if (victor) {
+                      setCurrentUser(victor);
+                      showToast("¡Perfil cambiado a Víctor (Director / Administrador)! Ahora puedes crear usuarios.");
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition-all shrink-0 active:scale-95"
+                >
+                  Cambiar a Perfil Administrador (Víctor)
+                </button>
+              </div>
+            )}
+            <UserManagement
+              users={users}
+              onAddUser={handleAddUser}
+              onUpdateUser={handleUpdateUser}
+              onDeleteUser={handleDeleteUser}
+              currentUser={currentUser}
+              leads={leads}
+              onAssignLead={handleAssignLead}
+            />
+          </div>
         )}
       </main>
 

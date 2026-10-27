@@ -197,6 +197,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
             )}
 
+            {isAdmin && (
+              <button
+                onClick={() => onNavigateTab("users")}
+                className="px-4 py-2.5 rounded-2xl text-xs font-bold text-purple-200 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-400 shadow-lg shadow-purple-900/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+                title="Abrir el menú lateral de gestión de usuarios"
+              >
+                <UserPlus className="w-4 h-4 text-purple-400" />
+                <span>+ Crear Usuario</span>
+              </button>
+            )}
+
             <button
               onClick={onOpenNewLead}
               className="px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 border border-blue-400/30 transition-all flex items-center justify-center gap-2 active:scale-95"
@@ -205,6 +216,45 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <span>+ Cargar Nuevo Cliente</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Banner Destacado: Menú Lateral y Creación de Usuarios */}
+      <div className="glass-panel p-4 sm:p-5 rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-slate-900 to-indigo-950/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 shadow-lg shadow-purple-600/20">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-black text-white">
+                Gestión de Usuarios &amp; Menú Lateral
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/40">
+                {users.filter((u) => u.activo).length} Colaboradores
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Accede al menú lateral para crear nuevos usuarios, configurar contraseñas, permisos RBAC y ceder carteras de clientes.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={() => onNavigateTab("users")}
+            className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2 active:scale-95"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>+ Crear Nuevo Usuario</span>
+          </button>
+          <button
+            onClick={() => onNavigateTab("users")}
+            className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-all flex items-center gap-1.5"
+          >
+            <Shield className="w-4 h-4 text-purple-400" />
+            <span>Ver Menú Lateral</span>
+          </button>
         </div>
       </div>
 
