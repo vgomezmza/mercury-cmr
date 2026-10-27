@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import type { Lead } from "../types/crm";
 import {
   Calculator,
   Layers,
@@ -17,10 +18,29 @@ import {
   Sparkles,
 } from "lucide-react";
 
-export const QuoteCalculator: React.FC = () => {
+interface QuoteCalculatorProps {
+  initialLead?: Lead | null;
+}
+
+export const QuoteCalculator: React.FC<QuoteCalculatorProps> = ({ initialLead }) => {
   // Service configuration states
-  const [clientName, setClientName] = useState("");
-  const [projectName, setProjectName] = useState("");
+  const [clientName, setClientName] = useState(initialLead?.nombre || "");
+  const [projectName, setProjectName] = useState(initialLead?.empresa || "");
+
+  useEffect(() => {
+    if (initialLead) {
+      if (initialLead.nombre) setClientName(initialLead.nombre);
+      if (initialLead.empresa) setProjectName(initialLead.empresa);
+      if (initialLead.servicioInteres === "CUSTOM_SOFTWARE") {
+        setDevType("software");
+        setIncludeDev(true);
+      } else if (initialLead.servicioInteres === "META_GOOGLE_ADS") {
+        setIncludeAds(true);
+      } else if (initialLead.servicioInteres === "MONTHLY_MAINTENANCE") {
+        setIncludeMaintenance(true);
+      }
+    }
+  }, [initialLead]);
 
   // UX/UI
   const [includeUxUi, setIncludeUxUi] = useState(true);

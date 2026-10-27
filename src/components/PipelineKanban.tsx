@@ -22,6 +22,7 @@ import {
   Mail,
   ChevronRight,
   ExternalLink,
+  Target,
 } from "lucide-react";
 
 interface PipelineKanbanProps {
@@ -256,9 +257,18 @@ export const PipelineKanban: React.FC<PipelineKanbanProps> = ({
                             <span />
                           )}
 
-                          <span className="text-[10px] text-slate-500 font-medium">
-                            {lead.createdAt}
-                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectLead(lead);
+                            }}
+                            className="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 hover:underline px-1.5 py-0.5 rounded-md hover:bg-cyan-950/40 border border-transparent hover:border-cyan-500/30 transition-all"
+                            title="Abrir Guía Paso a Paso al Cierre de la Venta"
+                          >
+                            <Target className="w-3 h-3 text-cyan-400" />
+                            <span>Guía Cierre</span>
+                          </button>
 
                           {nextStatusMap[lead.estado] ? (
                             <button

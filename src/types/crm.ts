@@ -52,6 +52,29 @@ export interface SocialInteraction {
 
 export type VerificationStatus = "VERIFICADO" | "PENDIENTE" | "REQUIERE_ACTUALIZACION";
 
+export interface SalesChecklist {
+  // Fase 1: NUEVO
+  contactoValidado?: boolean;
+  radarRedesRevisado?: boolean;
+  primerMensajeEnviado?: boolean;
+  // Fase 2: RELEVAMIENTO
+  reunionDiagnosticoRealizada?: boolean;
+  doloresYAlcanceDefinidos?: boolean;
+  presupuestoEstimadoValidado?: boolean;
+  // Fase 3: PROPUESTA_ENVIADA
+  propuestaCpqGenerada?: boolean;
+  propuestaEnviadaCliente?: boolean;
+  demoOPresentacionEfectuada?: boolean;
+  // Fase 4: EN_NEGOCIACION
+  objecionesResueltas?: boolean;
+  terminosYFormasPagoAcordados?: boolean;
+  decisionMakerAprobado?: boolean;
+  // Fase 5: GANADO
+  contratoFirmadoOConfirmado?: boolean;
+  anticipoFacturado?: boolean;
+  paseAProyectoEfectuado?: boolean;
+}
+
 export interface Lead {
   id: string;
   nombre: string;
@@ -76,6 +99,7 @@ export interface Lead {
   asignadoANombre?: string;
   creadoPorId?: string;
   whatsappMensajes?: WhatsAppMessage[];
+  checklistVenta?: SalesChecklist;
 }
 
 export interface Retainer {

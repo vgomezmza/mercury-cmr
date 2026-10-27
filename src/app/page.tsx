@@ -24,6 +24,7 @@ import {
   INITIAL_OPINIONS,
   INITIAL_USERS,
 } from "../data/initialData";
+import { SERVICE_LABELS } from "../components/PipelineKanban";
 import type {
   Lead,
   LeadStatus,
@@ -32,6 +33,8 @@ import type {
   SocialChannelsConfig,
   ClientOpinion,
   User,
+  Project,
+  Retainer,
 } from "../types/crm";
 import {
   Kanban,
@@ -138,6 +141,8 @@ export default function Home() {
   // Modals states
   const [isNewLeadOpen, setIsNewLeadOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLeadTab, setSelectedLeadTab] = useState<"guide" | "info" | "verify" | "edit">("guide");
+  const [activeQuoteLead, setActiveQuoteLead] = useState<Lead | null>(null);
 
   // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -198,7 +203,42 @@ export default function Home() {
 
   const handleSaveNewLead = (newLead: Lead) => {
     setLeads((prev) => [newLead, ...prev]);
-    showToast(`Nuevo lead ingresado: ${newLead.nombre} (${newLead.empresa})`);
+    setSelectedLead(newLead);
+    setSelectedLeadTab("guide");
+    showToast(`¡Cliente potencial registrado! Iniciando guía paso a paso al cierre.`);
+  };
+
+  const handleCreateProjectFromLead = (lead: Lead) => {
+    const newProject: Project = {
+      id: `proj-${Date.now()}`,
+      nombre: `Desarrollo ${SERVICE_LABELS[lead.servicioInteres]?.name || lead.servicioInteres}`,
+      cliente: lead.empresa || lead.nombre,
+      faseActual: "Wireframes",
+      progreso: 10,
+      fechaEntrega: "A definir (30 días)",
+    };
+    setProjects((prev) => [newProject, ...prev]);
+    setSelectedLead(null);
+    setActiveTab("retainers");
+    showToast(`¡Proyecto creado para ${lead.empresa}! Derivado al equipo de producción.`);
+  };
+
+  const handleCreateRetainerFromLead = (lead: Lead) => {
+    const newRetainer: Retainer = {
+      id: `ret-${Date.now()}`,
+      clienteNombre: lead.nombre,
+      empresa: lead.empresa,
+      servicio: SERVICE_LABELS[lead.servicioInteres]?.name || "Mantenimiento Proactivo",
+      cuotaMensual: lead.valorEstimado > 0 ? Math.round(lead.valorEstimado * 0.2) : 500,
+      moneda: lead.moneda,
+      diaCobro: 5,
+      proximaFecha: "10 del próximo mes",
+      estado: "ACTIVO",
+    };
+    setRetainers((prev) => [newRetainer, ...prev]);
+    setSelectedLead(null);
+    setActiveTab("retainers");
+    showToast(`¡Abono mensual registrado para ${lead.empresa}!`);
   };
 
   const handleAssignLead = (leadId: string, assignedUserId: string, assignedUserName: string) => {
@@ -454,7 +494,10 @@ export default function Home() {
             users={users}
             leads={leads}
             onOpenNewLead={() => setIsNewLeadOpen(true)}
-            onSelectLead={(lead) => setSelectedLead(lead)}
+            onSelectLead={(lead) => {
+              setSelectedLead(lead);
+              setSelectedLeadTab("guide");
+            }}
             onNavigateTab={(tabId) => setActiveTab(tabId as TabType)}
             onAssignLead={handleAssignLead}
             adminFilterUserId={adminFilterUserId}
@@ -465,10 +508,16 @@ export default function Home() {
         {activeTab === "prospects" && (
           <ProspectsDirectory
             leads={searchedLeads}
-            onSelectLead={(lead) => setSelectedLead(lead)}
+            onSelectLead={(lead) => {
+              setSelectedLead(lead);
+              setSelectedLeadTab("guide");
+            }}
             onUpdateStatus={handleUpdateLeadStatus}
             onGoToQuote={(lead) => {
+              setActiveQuoteLead(lead);
+              setSelectedLead(null);
               setActiveTab("quotes");
+              showToast(`Cotizador CPQ cargado para ${lead.empresa}`);
             }}
             onOpenNewLead={() => setIsNewLeadOpen(true)}
             currentUser={currentUser}
@@ -481,7 +530,10 @@ export default function Home() {
           <PipelineKanban
             leads={searchedLeads}
             onUpdateLeadStatus={handleUpdateLeadStatus}
-            onSelectLead={(lead) => setSelectedLead(lead)}
+            onSelectLead={(lead) => {
+              setSelectedLead(lead);
+              setSelectedLeadTab("guide");
+            }}
             filterService={filterService}
             setFilterService={setFilterService}
           />
@@ -493,7 +545,10 @@ export default function Home() {
             onReplyOpinion={handleReplyOpinion}
             onSelectLeadById={(leadId) => {
               const found = leads.find((l) => l.id === leadId);
-              if (found) setSelectedLead(found);
+              if (found) {
+                setSelectedLead(found);
+                setSelectedLeadTab("guide");
+              }
             }}
           />
         )}
@@ -506,7 +561,7 @@ export default function Home() {
           />
         )}
 
-        {activeTab === "quotes" && <QuoteCalculator />}
+        {activeTab === "quotes" && <QuoteCalculator initialLead={activeQuoteLead} />}
 
         {activeTab === "retainers" && (
           <RetainersProjects retainers={retainers} projects={projects} />
@@ -556,11 +611,17 @@ export default function Home() {
         onUpdateStatus={handleUpdateLeadStatus}
         onUpdateLead={handleUpdateLead}
         onGoToQuote={(lead) => {
+          setActiveQuoteLead(lead);
+          setSelectedLead(null);
           setActiveTab("quotes");
+          showToast(`Cotizador CPQ cargado para ${lead.empresa}`);
         }}
         currentUser={currentUser}
         users={users}
         onAssignLead={handleAssignLead}
+        initialTab={selectedLeadTab}
+        onCreateProject={handleCreateProjectFromLead}
+        onCreateRetainer={handleCreateRetainerFromLead}
       />
     </div>
   );

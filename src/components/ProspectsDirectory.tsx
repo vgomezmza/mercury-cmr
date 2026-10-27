@@ -24,6 +24,7 @@ import {
   ShieldAlert,
   Clock,
   UserPlus,
+  Target,
 } from "lucide-react";
 import { extractSocialHandle } from "../lib/prospectVerification";
 
@@ -449,12 +450,14 @@ export const ProspectsDirectory: React.FC<ProspectsDirectoryProps> = ({
                               <ArrowRight className="w-3 h-3" />
                             </button>
                           ) : (
-                            <button
-                              onClick={() => onSelectLead(lead)}
-                              className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold transition-all"
-                            >
-                              Ver Ficha
-                            </button>
+                          <button
+                            onClick={() => onSelectLead(lead)}
+                            className="px-2.5 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-[10px] font-bold transition-all flex items-center gap-1"
+                            title="Abrir Guía Paso a Paso al Cierre de la Venta"
+                          >
+                            <Target className="w-3 h-3 text-cyan-400" />
+                            <span>Guía Cierre</span>
+                          </button>
                           )}
                         </div>
                       </td>

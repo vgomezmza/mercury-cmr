@@ -23,6 +23,7 @@ import {
   FileText,
   UserCheck,
   UserPlus,
+  Target,
 } from "lucide-react";
 
 interface DashboardProps {
@@ -432,13 +433,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </a>
                       )}
 
-                      {/* View Lead Button */}
+                      {/* Guía de Cierre Button */}
                       <button
                         onClick={() => onSelectLead(lead)}
-                        className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 transition-all text-xs font-semibold flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600/30 to-indigo-600/30 hover:from-blue-600 hover:to-indigo-600 text-blue-200 hover:text-white border border-blue-500/40 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                        title="Abrir la Guía Paso a Paso al Cierre de la Venta"
                       >
-                        <span>Ver Ficha</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <Target className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Guía de Cierre</span>
                       </button>
 
                       {/* Admin Quick Re-assign dropdown */}
