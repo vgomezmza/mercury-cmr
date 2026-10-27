@@ -89,13 +89,19 @@ export const SocialHub: React.FC<SocialHubProps> = ({
       iconLabel: "𝕏",
       borderGlow: "border-slate-500/30",
     },
+    WHATSAPP: {
+      name: "WhatsApp",
+      tagClass: "bg-emerald-600/20 text-emerald-300 border-emerald-500/40",
+      iconLabel: "WA",
+      borderGlow: "border-emerald-500/30",
+    },
   };
 
   return (
     <div className="space-y-6">
       {/* Top Banner with Platform Status */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {(["FACEBOOK", "INSTAGRAM", "LINKEDIN", "X_TWITTER"] as SocialPlatform[]).map(
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        {(["FACEBOOK", "INSTAGRAM", "LINKEDIN", "X_TWITTER", "WHATSAPP"] as SocialPlatform[]).map(
           (p) => {
             const count = socialFeed.filter((s) => s.plataforma === p).length;
             const meta = platformMeta[p];
@@ -143,7 +149,7 @@ export const SocialHub: React.FC<SocialHubProps> = ({
           >
             Todas las Redes ({socialFeed.length})
           </button>
-          {(["FACEBOOK", "INSTAGRAM", "LINKEDIN", "X_TWITTER"] as SocialPlatform[]).map(
+          {(["FACEBOOK", "INSTAGRAM", "LINKEDIN", "X_TWITTER", "WHATSAPP"] as SocialPlatform[]).map(
             (p) => (
               <button
                 key={p}

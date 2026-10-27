@@ -28,7 +28,14 @@ export interface User {
   cargo?: string;
 }
 
-export type SocialPlatform = "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "X_TWITTER";
+export type SocialPlatform = "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "X_TWITTER" | "WHATSAPP";
+
+export interface WhatsAppMessage {
+  id: string;
+  remitente: "cliente" | "agente";
+  texto: string;
+  fecha: string;
+}
 
 export interface SocialInteraction {
   id: string;
@@ -55,7 +62,7 @@ export interface Lead {
   estado: LeadStatus;
   valorEstimado: number;
   moneda: "USD" | "ARS";
-  origen: "Facebook Ads" | "Instagram DM" | "LinkedIn" | "X (Twitter)" | "Web MercuryCAD" | "Referido";
+  origen: "Facebook Ads" | "Instagram DM" | "LinkedIn" | "X (Twitter)" | "Web MercuryCAD" | "Referido" | "WhatsApp";
   notas: string;
   prioridad: "Alta" | "Media" | "Baja";
   createdAt: string;
@@ -68,6 +75,7 @@ export interface Lead {
   asignadoAId?: string;
   asignadoANombre?: string;
   creadoPorId?: string;
+  whatsappMensajes?: WhatsAppMessage[];
 }
 
 export interface Retainer {
@@ -135,6 +143,12 @@ export interface SocialChannelsConfig {
     locationId: string;
     apiKey?: string;
     active: boolean;
+  };
+  whatsapp?: {
+    apiKey: string;
+    endpointUrl?: string;
+    active: boolean;
+    autoSync: boolean;
   };
 }
 

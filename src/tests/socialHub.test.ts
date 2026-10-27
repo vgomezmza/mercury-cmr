@@ -67,6 +67,7 @@ describe("3. Módulo Social Hub & Omnicanalidad (Facebook, Instagram, LinkedIn, 
         INSTAGRAM: "Instagram DM",
         LINKEDIN: "LinkedIn",
         X_TWITTER: "X (Twitter)",
+        WHATSAPP: "WhatsApp",
       };
 
       return {

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mercury CRM Bridge</title>
+  <style>
+    body {
+      width: 300px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #090d1a;
+      color: #f8fafc;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 10px;
+    }
+    .logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+    }
+    h1 {
+      font-size: 14px;
+      margin: 0;
+      font-weight: 800;
+      color: #fff;
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      outline: none;
+    }
+    input:focus {
+      border-color: #3b82f6;
+    }
+    button {
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 9px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 11px;
+      text-align: center;
+      display: none;
+    }
+    .status.success {
+      display: block;
+      color: #34d399;
+    }
+    .footer-note {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 12px;
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">M</div>
+    <div>
+      <h1>Mercury CRM</h1>
+      <span style="font-size: 10px; color: #60a5fa;">WhatsApp Web Bridge</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>URL de tu Mercury CRM:</label>
+    <input type="text" id="crmUrl" placeholder="https://tu-crm.vercel.app o http://localhost:3000">
+  </div>
+
+  <div class="field">
+    <label>API Key Secreta:</label>
+    <input type="password" id="crmApiKey" placeholder="mercury_wa_sec_2026">
+  </div>
+
+  <button id="saveBtn">Guardar Configuración</button>
+
+  <div id="status" class="status">¡Configuración guardada con éxito!</div>
+
+  <div class="footer-note">
+    Abre <strong>web.whatsapp.com</strong> para interactuar con tus leads y sincronizar mensajes.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

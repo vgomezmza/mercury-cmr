@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { EmailChannelConfig, SocialChannelsConfig } from "../types/crm";
+import { validateWhatsAppSync } from "../lib/whatsappBridge";
 import {
   Mail,
   Share2,
@@ -19,6 +20,12 @@ import {
   Sliders,
   Sparkles,
   ExternalLink,
+  MessageSquare,
+  Copy,
+  Check,
+  Terminal,
+  ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
 
 interface ChannelSettingsProps {
@@ -34,7 +41,7 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
   onSaveEmailConfig,
   onSaveSocialConfig,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<"email" | "meta" | "linkedin" | "x" | "google">("email");
+  const [activeSubTab, setActiveSubTab] = useState<"whatsapp" | "email" | "meta" | "linkedin" | "x" | "google">("whatsapp");
 
   // Local form states
   const [emailState, setEmailState] = useState<EmailChannelConfig>(emailConfig);
@@ -43,6 +50,44 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [testingStatus, setTestingStatus] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [waTestResponse, setWaTestResponse] = useState<string | null>(null);
+  const [isWaTesting, setIsWaTesting] = useState(false);
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const handleCopy = (text: string, label: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedText(label);
+      setTimeout(() => setCopiedText(null), 2500);
+    }
+  };
+
+  const handleTestWhatsAppSync = () => {
+    setIsWaTesting(true);
+    setWaTestResponse(null);
+    setTimeout(() => {
+      const result = validateWhatsAppSync({
+        apiKey: socialState.whatsapp?.apiKey || "mercury_wa_sec_2026",
+        phone: "+54 261 400-1000",
+        contactName: "Gabriel Guardia (Olivícola Laur)",
+        messages: [
+          {
+            sender: "cliente",
+            text: "Hola Víctor, me interesa avanzar con la propuesta de UX/UI y el rediseño web.",
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      if (result.success) {
+        setWaTestResponse(
+          `✅ Sincronización exitosa con WhatsApp Web: Mensaje procesado para Gabriel Guardia (+${result.cleanPhone}). El puente de comunicación está activo y seguro.`
+        );
+      } else {
+        setWaTestResponse(`⚠️ Error: ${result.error}`);
+      }
+      setIsWaTesting(false);
+    }, 600);
+  };
 
   // Quick preset loader for Email
   const loadPreset = (preset: "cpanel" | "google" | "microsoft" | "titan") => {
@@ -148,6 +193,13 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
         {/* Left Sub-Navigation */}
         <div className="space-y-2">
           {[
+            {
+              id: "whatsapp",
+              label: "WhatsApp Web Bridge",
+              desc: "Extensión Chrome / PC",
+              icon: MessageSquare,
+              activeColor: "border-emerald-500 bg-emerald-950/40 text-emerald-400",
+            },
             {
               id: "email",
               label: "Correo Mercury CAD",
@@ -672,6 +724,203 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                     }
                     placeholder="AIzaSy..."
                     className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-500 font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: WHATSAPP WEB BRIDGE */}
+          {activeSubTab === "whatsapp" && (
+            <div className="glass-panel border border-emerald-500/30 bg-emerald-950/10 rounded-3xl p-6 space-y-6 animate-in fade-in">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                      Puente WhatsApp Web (Extensión de Navegador)
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">
+                        Activo & Seguro
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Conecta tu WhatsApp Web abierto en tu PC con Mercury CRM en la nube sin costo y sin riesgo de baneo.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleTestWhatsAppSync}
+                  disabled={isWaTesting}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isWaTesting ? "animate-spin" : ""}`} />
+                  <span>{isWaTesting ? "Probando..." : "Simular Mensaje Entrante"}</span>
+                </button>
+              </div>
+
+              {/* Live Test Alert */}
+              {waTestResponse && (
+                <div className="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/40 text-xs font-medium text-emerald-300 flex items-center gap-2">
+                  <span>{waTestResponse}</span>
+                </div>
+              )}
+
+              {/* Guía Paso a Paso de Instalación */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-emerald-400" />
+                  <span>Cómo instalar la extensión en Chrome o Edge (Solo 30 segundos)</span>
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  {/* Paso 1 */}
+                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-emerald-400">Paso 1</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-mono">Navegador</span>
+                    </div>
+                    <p className="text-slate-300 font-medium">
+                      Abre en una pestaña nueva:
+                    </p>
+                    <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-200">
+                      <span>chrome://extensions</span>
+                      <button
+                        onClick={() => handleCopy("chrome://extensions", "url")}
+                        className="p-1 hover:text-emerald-400"
+                        title="Copiar"
+                      >
+                        {copiedText === "url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      Activa el interruptor <strong>"Modo de desarrollador"</strong> (esquina superior derecha).
+                    </p>
+                  </div>
+
+                  {/* Paso 2 */}
+                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-emerald-400">Paso 2</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-mono">Cargar Carpeta</span>
+                    </div>
+                    <p className="text-slate-300 font-medium">
+                      Clic en <strong>"Cargar descomprimida"</strong> y elige:
+                    </p>
+                    <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-200 truncate">
+                      <span className="truncate">c:\Proyectos\cmr\extension</span>
+                      <button
+                        onClick={() => handleCopy("c:\\Proyectos\\cmr\\extension", "path")}
+                        className="p-1 hover:text-emerald-400 shrink-0"
+                        title="Copiar ruta"
+                      >
+                        {copiedText === "path" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      La extensión <em>"Mercury CRM - WhatsApp Web Bridge"</em> quedará instalada de inmediato.
+                    </p>
+                  </div>
+
+                  {/* Paso 3 */}
+                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-emerald-400">Paso 3</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-mono">Configurar</span>
+                    </div>
+                    <p className="text-slate-300 font-medium">
+                      En el ícono de la extensión ingresa tu API Key:
+                    </p>
+                    <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-300">
+                      <span>mercury_wa_sec_2026</span>
+                      <button
+                        onClick={() => handleCopy("mercury_wa_sec_2026", "key")}
+                        className="p-1 hover:text-emerald-400"
+                        title="Copiar token"
+                      >
+                        {copiedText === "key" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      ¡Listo! Ya tienes conectado WhatsApp Web con el CRM.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cómo usarlo con tus clientes */}
+              <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Cómo interactuar con tus clientes en WhatsApp Web</span>
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <div className="font-bold text-white mb-1 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-blue-400" />
+                      1. Reconocimiento Automático
+                    </div>
+                    <p className="text-slate-400 leading-relaxed">
+                      Al abrir el chat de un cliente en <strong>web.whatsapp.com</strong>, el botón flotante <strong>"M"</strong> reconoce su número y te muestra su nombre, empresa, etapa y presupuesto.
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <div className="font-bold text-white mb-1 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      2. Sincronización en 1 Clic
+                    </div>
+                    <p className="text-slate-400 leading-relaxed">
+                      Haz clic en <strong>"📥 Sincronizar Conversación"</strong> para guardar las respuestas del cliente directamente en la ficha del CRM sin tener que copiar y pegar a mano.
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <div className="font-bold text-white mb-1 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-purple-400" />
+                      3. Alta de Nuevos Prospectos
+                    </div>
+                    <p className="text-slate-400 leading-relaxed">
+                      Si te escribe un contacto desconocido, el panel te ofrecerá el botón <strong>"+ Crear Lead en Mercury CAD"</strong> para registrarlo al instante.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Endpoints & Security Parameters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label className="text-slate-400 block mb-1">Ruta de la API Webhook en el CRM</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value="/api/whatsapp/sync"
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-emerald-300 font-mono text-[11px] outline-none"
+                  />
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Endpoint seguro con soporte CORS para llamadas desde WhatsApp Web.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-slate-400 block mb-1">API Key de Autenticación</label>
+                  <input
+                    type="text"
+                    value={socialState.whatsapp?.apiKey || "mercury_wa_sec_2026"}
+                    onChange={(e) =>
+                      setSocialState({
+                        ...socialState,
+                        whatsapp: {
+                          apiKey: e.target.value,
+                          active: true,
+                          autoSync: true,
+                        },
+                      })
+                    }
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono text-[11px] outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>

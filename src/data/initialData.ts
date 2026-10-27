@@ -133,6 +133,12 @@ export const DEFAULT_SOCIAL_CONFIG: SocialChannelsConfig = {
     locationId: "loc_mendoza_mercury_cad",
     active: true,
   },
+  whatsapp: {
+    apiKey: "mercury_wa_sec_2026",
+    endpointUrl: "/api/whatsapp/sync",
+    active: true,
+    autoSync: true,
+  },
 };
 
 export const INITIAL_OPINIONS: ClientOpinion[] = [];
