@@ -77,6 +77,32 @@ export function generateVerificationLinks(lead: Lead): VerificationLinks {
     instagramUrl = `https://www.instagram.com/${instagramUrl.replace(/^@/, "")}/`;
   }
 
+  // Direct Facebook link
+  const fbHandle = (lead.facebookHandle || "")
+    .trim()
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/(www\.)?facebook\.com\//, "")
+    .replace(/\/$/, "");
+  let facebookUrl = lead.facebookUrl;
+  if (!facebookUrl && fbHandle) {
+    facebookUrl = `https://www.facebook.com/${fbHandle}`;
+  } else if (!facebookUrl) {
+    facebookUrl = `https://www.facebook.com/search/top?q=${encodedCompany}`;
+  }
+
+  // Direct X (Twitter) link
+  const twHandle = (lead.twitterHandle || "")
+    .trim()
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/(www\.)?(x|twitter)\.com\//, "")
+    .replace(/\/$/, "");
+  let xUrl = lead.twitterUrl;
+  if (!xUrl && twHandle) {
+    xUrl = `https://x.com/${twHandle}`;
+  } else if (!xUrl) {
+    xUrl = `https://x.com/search?q=${encodedCompany}&f=user`;
+  }
+
   return {
     socialHandle: cleanHandle || undefined,
     // LinkedIn company page and executive search
@@ -89,9 +115,9 @@ export function generateVerificationLinks(lead: Lead): VerificationLinks {
     // Instagram
     instagramSearchUrl: instagramUrl,
     // X (Twitter)
-    xSearchUrl: `https://x.com/search?q=${encodedCompany}&f=user`,
+    xSearchUrl: xUrl,
     // Facebook
-    facebookSearchUrl: `https://www.facebook.com/search/top?q=${encodedCompany}`,
+    facebookSearchUrl: facebookUrl,
     // Official Website
     websiteUrl: lead.websiteUrl
       ? (lead.websiteUrl.startsWith("http") ? lead.websiteUrl : `https://${lead.websiteUrl}`)

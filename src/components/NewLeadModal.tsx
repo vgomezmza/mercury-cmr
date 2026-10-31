@@ -64,6 +64,10 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [instagramHandle, setInstagramHandle] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [facebookHandle, setFacebookHandle] = useState("");
+  const [twitterHandle, setTwitterHandle] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [servicioInteres, setServicioInteres] = useState<ServiceType>("UX_UI");
   const [valorEstimado, setValorEstimado] = useState<number>(2500);
   const [origen, setOrigen] = useState<Lead["origen"]>("Web MercuryCAD");
@@ -111,11 +115,12 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
   const handleLinkLinkedIn = () => {
     if (!suggestions) return;
     setOrigen("LinkedIn");
+    setLinkedinUrl(`https://www.linkedin.com/company/${suggestions.companyHandle}`);
     const tag = `Red: LinkedIn@${suggestions.companyHandle}.`;
     if (!notas.includes(tag)) {
       setNotas((prev) => (prev ? `${prev} | ${tag}` : tag));
     }
-    showFeedback("Canal de origen y handle de LinkedIn vinculados al prospecto.");
+    showFeedback("Canal de origen y perfil de LinkedIn vinculados al prospecto.");
   };
 
   // Quick Action: Link Instagram
@@ -156,6 +161,9 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
       setEmail(`${alias}@${primaryDomain}`);
     }
     setOrigen("LinkedIn");
+    setLinkedinUrl(`https://www.linkedin.com/company/${suggestions.companyHandle}`);
+    setInstagramHandle(`@${suggestions.instagramHandle}`);
+    setWebsiteUrl(`https://${primaryDomain}`);
     const tags = `Red: LinkedIn@${suggestions.companyHandle}. Dominio: ${primaryDomain}. Relevamiento en redes comerciales.`;
     setNotas((prev) => (prev ? `${prev}\n${tags}` : tags));
     showFeedback("¡Datos y redes sugeridas aplicados en el formulario!");
@@ -193,7 +201,10 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
     }
 
     const assignedUser = users.find((u) => u.id === assignedUserId) || currentUser;
-    const cleanIg = instagramHandle.trim().replace(/^@/, "");
+    const cleanIg = instagramHandle.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "");
+    const cleanFb = facebookHandle.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?facebook\.com\//, "").replace(/\/$/, "");
+    const cleanTw = twitterHandle.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?(x|twitter)\.com\//, "").replace(/\/$/, "");
+
     const newLead: Lead = {
       id: `lead-${Date.now()}`,
       nombre: nombre.trim() || empresa.trim(),
@@ -202,6 +213,12 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
       telefono: telefono.trim() || "+54 261 400-0000",
       instagramHandle: cleanIg ? `@${cleanIg}` : undefined,
       instagramUrl: cleanIg ? `https://www.instagram.com/${cleanIg}/` : undefined,
+      facebookHandle: cleanFb ? `@${cleanFb}` : undefined,
+      facebookUrl: cleanFb ? `https://www.facebook.com/${cleanFb}` : undefined,
+      twitterHandle: cleanTw ? `@${cleanTw}` : undefined,
+      twitterUrl: cleanTw ? `https://x.com/${cleanTw}` : undefined,
+      linkedinUrl: linkedinUrl.trim() || undefined,
+      websiteUrl: websiteUrl.trim() || undefined,
       servicioInteres,
       estado: "NUEVO",
       valorEstimado,
@@ -433,20 +450,88 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
                     />
                   </div>
 
-                  <div className="sm:col-span-2">
+                  {/* Instagram */}
+                  <div>
                     <label className="text-slate-300 block mb-1 font-semibold flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
                         <span className="w-4 h-4 rounded bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white text-[10px] flex items-center justify-center font-bold">IG</span>
-                        <span>Cuenta de Instagram del Prospecto</span>
+                        <span>Instagram</span>
                       </span>
-                      <span className="text-[10px] text-slate-500 font-normal">Opcional</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="ej. @bodeganorton o https://instagram.com/..."
+                      placeholder="ej. @bodeganorton"
                       value={instagramHandle}
                       onChange={(e) => setInstagramHandle(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 text-xs placeholder-slate-600 font-medium"
+                    />
+                  </div>
+
+                  {/* LinkedIn */}
+                  <div>
+                    <label className="text-slate-300 block mb-1 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-sky-600 text-white text-[10px] flex items-center justify-center font-bold">in</span>
+                        <span>LinkedIn</span>
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ej. linkedin.com/company/..."
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 text-xs placeholder-slate-600 font-medium"
+                    />
+                  </div>
+
+                  {/* Facebook */}
+                  <div>
+                    <label className="text-slate-300 block mb-1 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">fb</span>
+                        <span>Facebook</span>
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ej. @bodeganorton"
+                      value={facebookHandle}
+                      onChange={(e) => setFacebookHandle(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500 text-xs placeholder-slate-600 font-medium"
+                    />
+                  </div>
+
+                  {/* X (Twitter) */}
+                  <div>
+                    <label className="text-slate-300 block mb-1 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-slate-800 border border-slate-700 text-white text-[10px] flex items-center justify-center font-bold">𝕏</span>
+                        <span>X (Twitter)</span>
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ej. @bodeganorton"
+                      value={twitterHandle}
+                      onChange={(e) => setTwitterHandle(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500 text-xs placeholder-slate-600 font-medium"
+                    />
+                  </div>
+
+                  {/* Sitio Web */}
+                  <div className="sm:col-span-2">
+                    <label className="text-slate-300 block mb-1 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Sitio Web Corporativo</span>
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ej. https://bodeganorton.com"
+                      value={websiteUrl}
+                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-emerald-500 text-xs placeholder-slate-600 font-medium font-mono"
                     />
                   </div>
                 </div>

@@ -95,6 +95,8 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     lead.instagramHandle || lead.instagramUrl || extractSocialHandle(lead.notas) || ""
   );
   const [editLinkedin, setEditLinkedin] = useState(lead.linkedinUrl || "");
+  const [editFacebook, setEditFacebook] = useState(lead.facebookHandle || lead.facebookUrl || "");
+  const [editTwitter, setEditTwitter] = useState(lead.twitterHandle || lead.twitterUrl || "");
   const [editWebsite, setEditWebsite] = useState(lead.websiteUrl || "");
 
   // Sync edit form when lead changes
@@ -106,6 +108,8 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     setEditNotas(lead.notas);
     setEditInstagram(lead.instagramHandle || lead.instagramUrl || extractSocialHandle(lead.notas) || "");
     setEditLinkedin(lead.linkedinUrl || "");
+    setEditFacebook(lead.facebookHandle || lead.facebookUrl || "");
+    setEditTwitter(lead.twitterHandle || lead.twitterUrl || "");
     setEditWebsite(lead.websiteUrl || "");
     setActiveTab(initialTab);
   }, [lead.id, initialTab]);
@@ -169,8 +173,26 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   const handleSaveEdits = (e: React.FormEvent) => {
     e.preventDefault();
     if (!onUpdateLead) return;
-    const cleanIg = editInstagram.trim().replace(/^@/, "");
-    const fullIgUrl = cleanIg ? `https://www.instagram.com/${cleanIg}/` : undefined;
+    const cleanIg = editInstagram.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "");
+    const fullIgUrl = editInstagram.trim().startsWith("http")
+      ? editInstagram.trim()
+      : cleanIg
+      ? `https://www.instagram.com/${cleanIg}/`
+      : undefined;
+
+    const cleanFb = editFacebook.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?facebook\.com\//, "").replace(/\/$/, "");
+    const fullFbUrl = editFacebook.trim().startsWith("http")
+      ? editFacebook.trim()
+      : cleanFb
+      ? `https://www.facebook.com/${cleanFb}`
+      : undefined;
+
+    const cleanTw = editTwitter.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?(x|twitter)\.com\//, "").replace(/\/$/, "");
+    const fullTwUrl = editTwitter.trim().startsWith("http")
+      ? editTwitter.trim()
+      : cleanTw
+      ? `https://x.com/${cleanTw}`
+      : undefined;
 
     onUpdateLead({
       ...lead,
@@ -181,6 +203,10 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
       notas: editNotas.trim(),
       instagramHandle: cleanIg ? `@${cleanIg}` : undefined,
       instagramUrl: fullIgUrl,
+      facebookHandle: cleanFb ? `@${cleanFb}` : undefined,
+      facebookUrl: fullFbUrl,
+      twitterHandle: cleanTw ? `@${cleanTw}` : undefined,
+      twitterUrl: fullTwUrl,
       linkedinUrl: editLinkedin.trim() || undefined,
       websiteUrl: editWebsite.trim() || undefined,
       verificacionEstado: "VERIFICADO",
@@ -266,30 +292,91 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                 <span>WhatsApp: {lead.telefono || "Sin teléfono"}</span>
               </a>
               <span className="text-slate-600">•</span>
+              <span>{lead.email || "Sin email"}</span>
+            </p>
+
+            {/* Quick Social Badges Bar */}
+            <div className="flex items-center gap-1.5 mt-2 flex-wrap text-xs">
+              {/* Instagram */}
               {lead.instagramHandle || lead.instagramUrl || links.socialHandle ? (
                 <a
                   href={links.instagramSearchUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="px-2 py-0.5 rounded-lg bg-pink-950/60 border border-pink-500/40 text-pink-300 hover:text-white hover:border-pink-400 flex items-center gap-1 font-bold text-[11px] transition-all"
-                  title="Abrir cuenta de Instagram"
+                  title="Abrir Instagram"
                 >
                   <span>📸 {lead.instagramHandle || `@${links.socialHandle}`}</span>
                   <ExternalLink className="w-2.5 h-2.5" />
                 </a>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("edit")}
-                  className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 hover:text-pink-300 border border-slate-700 text-[10px] transition-all"
-                  title="Agregar cuenta de Instagram del cliente"
+              ) : null}
+
+              {/* LinkedIn */}
+              {lead.linkedinUrl ? (
+                <a
+                  href={links.linkedinCompanyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2 py-0.5 rounded-lg bg-sky-950/60 border border-sky-500/40 text-sky-300 hover:text-white hover:border-sky-400 flex items-center gap-1 font-bold text-[11px] transition-all"
+                  title="Abrir LinkedIn"
                 >
-                  + Agregar Instagram
-                </button>
-              )}
-              <span className="text-slate-600">•</span>
-              <span>{lead.email || "Sin email"}</span>
-            </p>
+                  <span>in LinkedIn</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : null}
+
+              {/* Facebook */}
+              {lead.facebookHandle || lead.facebookUrl ? (
+                <a
+                  href={links.facebookSearchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2 py-0.5 rounded-lg bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 hover:text-white hover:border-indigo-400 flex items-center gap-1 font-bold text-[11px] transition-all"
+                  title="Abrir Facebook"
+                >
+                  <span>fb {lead.facebookHandle || "Facebook"}</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : null}
+
+              {/* X / Twitter */}
+              {lead.twitterHandle || lead.twitterUrl ? (
+                <a
+                  href={links.xSearchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 hover:text-white hover:border-slate-500 flex items-center gap-1 font-bold text-[11px] transition-all"
+                  title="Abrir X / Twitter"
+                >
+                  <span>𝕏 {lead.twitterHandle || "X"}</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : null}
+
+              {/* Website */}
+              {links.websiteUrl ? (
+                <a
+                  href={links.websiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2 py-0.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 hover:text-white hover:border-emerald-400 flex items-center gap-1 font-bold text-[11px] transition-all"
+                  title="Abrir Sitio Web"
+                >
+                  <span>🌐 Web</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : null}
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("edit")}
+                className="px-2 py-0.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-300 border border-slate-700 hover:border-amber-500/40 text-[10px] font-semibold transition-all flex items-center gap-1"
+                title="Modificar cuentas de redes sociales del cliente"
+              >
+                <Edit2 className="w-2.5 h-2.5 text-amber-400" />
+                <span>Modificar Redes</span>
+              </button>
+            </div>
           </div>
 
           <div className="text-left sm:text-right bg-slate-900/80 border border-slate-800/80 rounded-2xl p-3 sm:px-4 sm:py-2.5">
@@ -981,121 +1068,224 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                 <span>Auditar Presencia en Redes Sociales (1 Clic)</span>
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {/* LinkedIn Company */}
-                <a
-                  href={links.linkedinCompanyUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-3 rounded-2xl bg-sky-950/30 border border-sky-500/30 hover:bg-sky-900/40 hover:border-sky-400 transition-all flex items-center justify-between group"
-                >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {/* 1. WhatsApp Directo */}
+                <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 hover:border-emerald-400 transition-all flex flex-col justify-between gap-3 group">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-sky-600/30 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center">
-                      in
+                    <span className="w-8 h-8 rounded-xl bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 text-xs font-bold flex items-center justify-center">
+                      <MessageCircle className="w-4 h-4" />
                     </span>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-sky-300">
-                        LinkedIn Empresa
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white group-hover:text-emerald-300 truncate">
+                        WhatsApp Directo
                       </div>
-                      <div className="text-[11px] text-slate-400">
-                        {links.socialHandle ? `@${links.socialHandle}` : lead.empresa}
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {lead.telefono || "Sin registrar"}
                       </div>
                     </div>
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-sky-400 group-hover:translate-x-0.5 transition-transform" />
-                </a>
-
-                {/* LinkedIn Person Search */}
-                <a
-                  href={links.linkedinPersonSearchUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-3 rounded-2xl bg-blue-950/30 border border-blue-500/30 hover:bg-blue-900/40 hover:border-blue-400 transition-all flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-blue-600/30 border border-blue-500/40 text-blue-300 font-bold text-xs flex items-center justify-center">
-                      👤
-                    </span>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-blue-300">
-                        Verificar Decisor en LinkedIn
-                      </div>
-                      <div className="text-[11px] text-slate-400">
-                        Buscar perfil de {lead.nombre}
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("edit")}
+                      className="text-[11px] font-semibold text-slate-300 hover:text-emerald-400 flex items-center gap-1"
+                    >
+                      <Edit2 className="w-3 h-3 text-emerald-400" />
+                      <span>Modificar</span>
+                    </button>
+                    {lead.telefono && (
+                      <a
+                        href={`https://wa.me/${cleanPhone}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs transition-all"
+                        title="Abrir chat de WhatsApp"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-blue-400 group-hover:translate-x-0.5 transition-transform" />
-                </a>
+                </div>
 
-                {/* Official Website */}
-                {links.websiteUrl && (
-                  <a
-                    href={links.websiteUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 hover:bg-emerald-900/40 hover:border-emerald-400 transition-all flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center">
-                        <Globe className="w-4 h-4" />
-                      </span>
-                      <div>
-                        <div className="text-xs font-bold text-white group-hover:text-emerald-300">
-                          Sitio Web Oficial
-                        </div>
-                        <div className="text-[11px] text-slate-400 font-mono">
-                          {quality.domain}
-                        </div>
-                      </div>
-                    </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
-                  </a>
-                )}
-
-                {/* Instagram Search / Direct Link */}
-                <div className="p-3.5 rounded-2xl bg-pink-950/30 border border-pink-500/30 hover:border-pink-400 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
+                {/* 2. Instagram Oficial */}
+                <div className="p-3.5 rounded-2xl bg-pink-950/30 border border-pink-500/30 hover:border-pink-400 transition-all flex flex-col justify-between gap-3 group">
                   <div className="flex items-center gap-2.5">
                     <span className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white font-bold text-xs flex items-center justify-center shadow-md shadow-pink-600/20">
                       IG
                     </span>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-pink-300 flex items-center gap-1.5">
-                        <span>Instagram Oficial</span>
-                        {lead.instagramHandle && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-pink-900/60 text-pink-200 border border-pink-500/40">
-                            {lead.instagramHandle}
-                          </span>
-                        )}
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white group-hover:text-pink-300 truncate">
+                        Instagram Oficial
                       </div>
-                      <div className="text-[11px] text-slate-400">
-                        {lead.instagramHandle
-                          ? `Cuenta vinculada: ${lead.instagramHandle}`
-                          : links.socialHandle
-                          ? `Detectado: @${links.socialHandle}`
-                          : `${lead.empresa} en Instagram`}
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {lead.instagramHandle || (links.socialHandle ? `@${links.socialHandle}` : "Sin vincular")}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
                     <button
                       type="button"
                       onClick={() => setActiveTab("edit")}
-                      className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[11px] font-semibold transition-all flex items-center gap-1"
-                      title="Editar cuenta o usuario de Instagram"
+                      className="text-[11px] font-semibold text-slate-300 hover:text-pink-400 flex items-center gap-1"
                     >
                       <Edit2 className="w-3 h-3 text-pink-400" />
-                      <span>Modificar Cuenta</span>
+                      <span>Modificar</span>
                     </button>
                     <a
                       href={links.instagramSearchUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs transition-all shadow-md shadow-pink-600/30"
-                      title="Abrir perfil en Instagram"
+                      className="p-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white text-xs transition-all"
+                      title="Abrir perfil de Instagram"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
+                  </div>
+                </div>
+
+                {/* 3. LinkedIn Empresa */}
+                <div className="p-3.5 rounded-2xl bg-sky-950/30 border border-sky-500/30 hover:border-sky-400 transition-all flex flex-col justify-between gap-3 group">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded-xl bg-sky-600/30 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center">
+                      in
+                    </span>
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white group-hover:text-sky-300 truncate">
+                        LinkedIn Empresa
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {lead.linkedinUrl || (links.socialHandle ? `@${links.socialHandle}` : lead.empresa)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("edit")}
+                      className="text-[11px] font-semibold text-slate-300 hover:text-sky-400 flex items-center gap-1"
+                    >
+                      <Edit2 className="w-3 h-3 text-sky-400" />
+                      <span>Modificar</span>
+                    </button>
+                    <a
+                      href={links.linkedinCompanyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="p-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs transition-all"
+                      title="Abrir perfil de LinkedIn"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 4. Facebook Fanpage */}
+                <div className="p-3.5 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 hover:border-indigo-400 transition-all flex flex-col justify-between gap-3 group">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 font-bold text-xs flex items-center justify-center">
+                      fb
+                    </span>
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white group-hover:text-indigo-300 truncate">
+                        Facebook Fanpage
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {lead.facebookHandle || (lead.facebookUrl ? "Vinculado" : `${lead.empresa} en FB`)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("edit")}
+                      className="text-[11px] font-semibold text-slate-300 hover:text-indigo-400 flex items-center gap-1"
+                    >
+                      <Edit2 className="w-3 h-3 text-indigo-400" />
+                      <span>Modificar</span>
+                    </button>
+                    <a
+                      href={links.facebookSearchUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs transition-all"
+                      title="Abrir Facebook"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 5. X (Twitter) */}
+                <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 hover:border-slate-500 transition-all flex flex-col justify-between gap-3 group">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold text-xs flex items-center justify-center">
+                      𝕏
+                    </span>
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white group-hover:text-slate-200 truncate">
+                        X (Twitter)
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {lead.twitterHandle || (lead.twitterUrl ? "Vinculado" : `@${lead.empresa.replace(/\s+/g, "").toLowerCase()}`)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("edit")}
+                      className="text-[11px] font-semibold text-slate-300 hover:text-white flex items-center gap-1"
+                    >
+                      <Edit2 className="w-3 h-3 text-slate-400" />
+                      <span>Modificar</span>
+                    </button>
+                    <a
+                      href={links.xSearchUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs transition-all"
+                      title="Abrir X / Twitter"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 6. Sitio Web Oficial */}
+                <div className="p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 hover:border-emerald-400 transition-all flex flex-col justify-between gap-3 group">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded-xl bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center">
+                      <Globe className="w-4 h-4" />
+                    </span>
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white group-hover:text-emerald-300 truncate">
+                        Sitio Web Oficial
+                      </div>
+                      <div className="text-[11px] text-slate-400 font-mono truncate">
+                        {lead.websiteUrl || quality.domain}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("edit")}
+                      className="text-[11px] font-semibold text-slate-300 hover:text-emerald-400 flex items-center gap-1"
+                    >
+                      <Edit2 className="w-3 h-3 text-emerald-400" />
+                      <span>Modificar</span>
+                    </button>
+                    {links.websiteUrl && (
+                      <a
+                        href={links.websiteUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs transition-all"
+                        title="Visitar sitio web"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1154,54 +1344,96 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
 
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">
-                  Teléfono / WhatsApp
+                  Teléfono / WhatsApp Directo *
                 </label>
                 <input
                   type="text"
                   required
                   value={editTelefono}
                   onChange={(e) => setEditTelefono(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-500 text-xs"
+                  placeholder="+54 9 261 400-0000"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-500 text-xs font-mono"
                 />
               </div>
             </div>
 
-            {/* Redes Sociales del Prospecto */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-pink-950/30 border border-slate-700/80 space-y-3">
-              <span className="text-xs font-bold text-white flex items-center gap-2">
-                <Share2 className="w-4 h-4 text-pink-400" />
-                <span>Redes Sociales &amp; Presencia Digital del Prospecto</span>
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Redes Sociales del Prospecto (Todas las redes) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 border border-slate-700/80 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white flex items-center gap-2">
+                  <Share2 className="w-4 h-4 text-cyan-400" />
+                  <span>Redes Sociales &amp; Perfiles Digitales del Cliente</span>
+                </span>
+                <span className="text-[10px] text-slate-400">Puedes ingresar el usuario (@cuenta) o el link completo</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* Instagram */}
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
                     <span className="w-4 h-4 rounded bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white text-[10px] flex items-center justify-center font-bold">IG</span>
-                    Cuenta de Instagram
+                    Instagram Oficial
                   </label>
                   <input
                     type="text"
                     placeholder="ej. @bodeganorton o link"
                     value={editInstagram}
                     onChange={(e) => setEditInstagram(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 text-xs"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 text-xs"
                   />
-                  <span className="text-[10px] text-slate-500 mt-0.5 block">Nombre de usuario o URL completa</span>
+                  <span className="text-[10px] text-slate-500 mt-0.5 block">instagram.com/usuario</span>
                 </div>
+
+                {/* LinkedIn */}
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
                     <span className="w-4 h-4 rounded bg-sky-600 text-white text-[10px] flex items-center justify-center font-bold">in</span>
-                    LinkedIn Empresa / Decisor
+                    LinkedIn Empresa / Perfil
                   </label>
                   <input
                     type="text"
                     placeholder="ej. linkedin.com/company/..."
                     value={editLinkedin}
                     onChange={(e) => setEditLinkedin(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 text-xs"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 text-xs"
                   />
-                  <span className="text-[10px] text-slate-500 mt-0.5 block">Enlace al perfil de LinkedIn</span>
+                  <span className="text-[10px] text-slate-500 mt-0.5 block">linkedin.com/in/usuario</span>
                 </div>
+
+                {/* Facebook */}
                 <div>
+                  <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">fb</span>
+                    Facebook Fanpage / Perfil
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="ej. @bodeganorton o link"
+                    value={editFacebook}
+                    onChange={(e) => setEditFacebook(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500 text-xs"
+                  />
+                  <span className="text-[10px] text-slate-500 mt-0.5 block">facebook.com/pagina</span>
+                </div>
+
+                {/* X (Twitter) */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded bg-slate-800 border border-slate-700 text-white text-[10px] flex items-center justify-center font-bold">𝕏</span>
+                    X (Twitter)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="ej. @bodeganorton o link"
+                    value={editTwitter}
+                    onChange={(e) => setEditTwitter(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500 text-xs"
+                  />
+                  <span className="text-[10px] text-slate-500 mt-0.5 block">x.com/usuario</span>
+                </div>
+
+                {/* Sitio Web Oficial */}
+                <div className="sm:col-span-2">
                   <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-emerald-400" />
                     Sitio Web Oficial
@@ -1211,9 +1443,9 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                     placeholder="ej. https://empresa.com.ar"
                     value={editWebsite}
                     onChange={(e) => setEditWebsite(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-emerald-500 text-xs"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-emerald-500 text-xs font-mono"
                   />
-                  <span className="text-[10px] text-slate-500 mt-0.5 block">Dominio corporativo</span>
+                  <span className="text-[10px] text-slate-500 mt-0.5 block">Dominio corporativo con o sin https://</span>
                 </div>
               </div>
             </div>

@@ -474,6 +474,25 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Bottom Email Save */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                <span className="text-[11px] text-slate-400">
+                  Guarda las credenciales del servidor corporativo de correo de Mercury CAD.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSaveEmailConfig(emailState);
+                    setSaveSuccess(true);
+                    setTimeout(() => setSaveSuccess(false), 3000);
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Configuración de Correo</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -483,6 +502,11 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
               .trim()
               .replace(/^@/, "")
               .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
+              .replace(/\/$/, "");
+
+            const currentFb = (socialState.meta?.pageId || "")
+              .trim()
+              .replace(/^https?:\/\/(www\.)?facebook\.com\//, "")
               .replace(/\/$/, "");
 
             return (
@@ -496,15 +520,15 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-white flex items-center gap-2">
-                        Meta Graph API & Instagram Business
+                        Meta Graph API (Instagram & Facebook)
                         <span className="text-[10px] bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2 py-0.5 rounded-full font-semibold">
                           {currentIg ? `@${currentIg}` : "Sin vincular"}
                         </span>
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">
                         {currentIg
-                          ? `Conectado a @${currentIg} para leer comentarios, DMs y opiniones de publicaciones.`
-                          : "Configura el usuario de Instagram oficial para monitorear publicaciones y mensajes."}
+                          ? `Conectado a @${currentIg} y Facebook ${currentFb || "oficial"} para comentarios, DMs y opiniones.`
+                          : "Configura el usuario de Instagram y Facebook oficial para monitorear publicaciones y mensajes."}
                       </p>
                     </div>
                   </div>
@@ -526,40 +550,74 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                       className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md shadow-pink-600/30 transition-all flex items-center gap-1.5 active:scale-95"
                     >
                       <Save className="w-3.5 h-3.5" />
-                      <span>Guardar Instagram</span>
+                      <span>Guardar Meta</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Instagram Live Preview Box */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-950/30 via-purple-950/20 to-slate-900 border border-pink-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-pink-600/20 border border-pink-500/40 flex items-center justify-center text-pink-400 shrink-0">
-                      <Share2 className="w-4 h-4" />
+                {/* Meta Live Preview Box (Instagram & Facebook) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Instagram Live Box */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-950/30 via-purple-950/20 to-slate-900 border border-pink-500/30 flex flex-col justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-pink-600/20 border border-pink-500/40 flex items-center justify-center text-pink-400 shrink-0">
+                        <Share2 className="w-4 h-4" />
+                      </div>
+                      <div className="overflow-hidden">
+                        <span className="text-[10px] text-pink-300 font-semibold uppercase tracking-wider block">
+                          Perfil Activo de Instagram
+                        </span>
+                        <strong className="text-sm text-white truncate block">
+                          {currentIg ? `@${currentIg}` : "No configurado"}
+                        </strong>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[10px] text-pink-300 font-semibold uppercase tracking-wider block">
-                        Perfil Activo de Instagram
-                      </span>
-                      <strong className="text-sm text-white">
-                        {currentIg ? `@${currentIg}` : "No has configurado una cuenta de Instagram todavía"}
-                      </strong>
-                    </div>
+
+                    {currentIg ? (
+                      <a
+                        href={`https://instagram.com/${currentIg}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600/30 hover:bg-pink-600/50 text-pink-200 border border-pink-500/50 text-xs font-semibold transition-all self-start"
+                      >
+                        <span>Ver perfil instagram.com/{currentIg}</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-500 italic">Escribe el usuario abajo</span>
+                    )}
                   </div>
 
-                  {currentIg ? (
-                    <a
-                      href={`https://instagram.com/${currentIg}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600/30 hover:bg-pink-600/50 text-pink-200 border border-pink-500/50 text-xs font-semibold transition-all self-start sm:self-auto"
-                    >
-                      <span>Ver perfil instagram.com/{currentIg}</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  ) : (
-                    <span className="text-xs text-slate-500 italic">Escribe el usuario abajo para habilitar el enlace directo</span>
-                  )}
+                  {/* Facebook Live Box */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/30 via-slate-900 to-slate-900 border border-blue-500/30 flex flex-col justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shrink-0 font-bold">
+                        f
+                      </div>
+                      <div className="overflow-hidden">
+                        <span className="text-[10px] text-blue-300 font-semibold uppercase tracking-wider block">
+                          Página Activa de Facebook
+                        </span>
+                        <strong className="text-sm text-white truncate block">
+                          {currentFb ? currentFb : "No configurada"}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {currentFb ? (
+                      <a
+                        href={`https://facebook.com/${currentFb}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/50 text-xs font-semibold transition-all self-start"
+                      >
+                        <span>Ver página facebook.com/{currentFb}</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-500 italic">Escribe el identificador abajo</span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -586,7 +644,7 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
 
                   <div>
                     <label className="text-slate-300 font-semibold block mb-1">
-                      Facebook Page ID / Handle Oficial
+                      Facebook Page ID / Handle Oficial *
                     </label>
                     <input
                       type="text"
@@ -598,10 +656,10 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                         })
                       }
                       placeholder="ej: mercurycreationandesign"
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-pink-500 font-mono text-xs"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-blue-500 font-mono text-xs"
                     />
                     <p className="text-[11px] text-slate-400 mt-1.5">
-                      Página de Facebook vinculada a la cuenta de Instagram.
+                      Página de Facebook vinculada para sincronizar comentarios y mensajes de clientes.
                     </p>
                   </div>
 
@@ -640,7 +698,7 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                 {/* Bottom Save Action */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
                   <span className="text-[11px] text-slate-400">
-                    Al guardar, los datos de Instagram de Mercury CAD se sincronizarán en tiempo real.
+                    Al guardar, los datos de Instagram y Facebook de Mercury CAD se sincronizarán en tiempo real.
                   </span>
                   <button
                     onClick={() => {
@@ -651,7 +709,7 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
                     className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-pink-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
                   >
                     <Save className="w-4 h-4" />
-                    <span>Guardar Configuración de Instagram</span>
+                    <span>Guardar Configuración de Meta (Instagram & Facebook)</span>
                   </button>
                 </div>
               </div>
@@ -659,418 +717,742 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
           })()}
 
           {/* TAB 3: LINKEDIN */}
-          {activeSubTab === "linkedin" && (
-            <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold">
-                    in
+          {activeSubTab === "linkedin" && (() => {
+            const currentOrg = (socialState.linkedIn?.orgId || "")
+              .trim()
+              .replace(/^https?:\/\/(www\.)?linkedin\.com\/company\//, "")
+              .replace(/\/$/, "");
+
+            return (
+              <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5 animate-in fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-base">
+                      in
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white flex items-center gap-2">
+                        LinkedIn B2B & Empresa
+                        <span className="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-semibold">
+                          {currentOrg ? currentOrg : "Sin vincular"}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Rastreo de directivos y empresas seguidas en Mendoza y recomendaciones públicas.
+                      </p>
+                    </div>
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleTestConnection("LinkedIn API")}
+                      className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Probar Conexión</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSaveSocialConfig(socialState);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
+                      }}
+                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-sky-600/30 transition-all flex items-center gap-1.5 active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Guardar LinkedIn</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* LinkedIn Live Preview Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/30 via-slate-900 to-slate-900 border border-sky-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-sky-600/20 border border-sky-500/40 flex items-center justify-center text-sky-400 shrink-0 font-bold">
+                      in
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-sky-300 font-semibold uppercase tracking-wider block">
+                        Página de Empresa LinkedIn Monitoreada
+                      </span>
+                      <strong className="text-sm text-white">
+                        {currentOrg ? `linkedin.com/company/${currentOrg}` : "No has configurado una página de empresa todavía"}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {currentOrg ? (
+                    <a
+                      href={`https://www.linkedin.com/company/${currentOrg}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-600/30 hover:bg-sky-600/50 text-sky-200 border border-sky-500/50 text-xs font-semibold transition-all self-start sm:self-auto"
+                    >
+                      <span>Ver perfil linkedin.com/company/{currentOrg}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-500 italic">Escribe el slug abajo para habilitar el enlace directo</span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <h3 className="text-sm font-bold text-white">
-                      LinkedIn Developer API (Prospección & Menciones B2B)
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      Rastreo de directivos y empresas seguidas en Mendoza y recomendaciones públicas.
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Organization Page Slug (ID de Página LinkedIn) *
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.linkedIn.orgId}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          linkedIn: { ...socialState.linkedIn, orgId: e.target.value },
+                        })
+                      }
+                      placeholder="ej: mercury-creation-and-design"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-sky-500 font-mono text-xs"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Identificador de empresa en la URL: linkedin.com/company/<strong>slug</strong>
                     </p>
                   </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">Client ID (LinkedIn Developer)</label>
+                    <input
+                      type="text"
+                      value={socialState.linkedIn.clientId}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          linkedIn: { ...socialState.linkedIn, clientId: e.target.value },
+                        })
+                      }
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 font-mono text-[11px]"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-slate-400 block mb-1">OAuth 2.0 Access Token</label>
+                    <input
+                      type="password"
+                      value={socialState.linkedIn.accessToken || ""}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          linkedIn: { ...socialState.linkedIn, accessToken: e.target.value },
+                        })
+                      }
+                      placeholder="AQV...token"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 font-mono text-[11px]"
+                    />
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => handleTestConnection("LinkedIn API")}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-sky-400" />
-                  <span>Probar Conexión</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="text-slate-400 block mb-1">Organization Page Slug</label>
-                  <input
-                    type="text"
-                    value={socialState.linkedIn.orgId}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        linkedIn: { ...socialState.linkedIn, orgId: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">Client ID</label>
-                  <input
-                    type="text"
-                    value={socialState.linkedIn.clientId}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        linkedIn: { ...socialState.linkedIn, clientId: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 font-mono text-[11px]"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="text-slate-400 block mb-1">OAuth 2.0 Access Token</label>
-                  <input
-                    type="password"
-                    value={socialState.linkedIn.accessToken || ""}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        linkedIn: { ...socialState.linkedIn, accessToken: e.target.value },
-                      })
-                    }
-                    placeholder="AQV...token"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-sky-500 font-mono text-[11px]"
-                  />
+                {/* Bottom Save Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400">
+                    Al guardar, las interacciones B2B de LinkedIn se sincronizarán con Mercury CAD.
+                  </span>
+                  <button
+                    onClick={() => {
+                      onSaveSocialConfig(socialState);
+                      setSaveSuccess(true);
+                      setTimeout(() => setSaveSuccess(false), 3000);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Guardar Configuración de LinkedIn</span>
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB 4: X (TWITTER) */}
-          {activeSubTab === "x" && (
-            <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-white font-bold text-sm">
-                    𝕏
-                  </span>
-                  <div>
-                    <h3 className="text-sm font-bold text-white">X API v2 (Social Listening)</h3>
-                    <p className="text-[11px] text-slate-400">
-                      Rastreo de menciones a @mercurycad_ar y opiniones del sector tecnológico.
-                    </p>
+          {activeSubTab === "x" && (() => {
+            const currentX = (socialState.xTwitter?.handle || "")
+              .trim()
+              .replace(/^@/, "")
+              .replace(/^https?:\/\/(www\.)?x\.com\//, "")
+              .replace(/^https?:\/\/(www\.)?twitter\.com\//, "")
+              .replace(/\/$/, "");
+
+            return (
+              <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5 animate-in fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-base">
+                      𝕏
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white flex items-center gap-2">
+                        X API v2 (Social Listening)
+                        <span className="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full font-semibold">
+                          {currentX ? `@${currentX}` : "Sin vincular"}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Rastreo de menciones a @mercurycad_ar y opiniones del sector tecnológico.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleTestConnection("X API v2")}
+                      className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-slate-300" />
+                      <span>Probar API X</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSaveSocialConfig(socialState);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
+                      }}
+                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-bold text-xs shadow-md shadow-slate-900/30 transition-all flex items-center gap-1.5 active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Guardar X</span>
+                    </button>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleTestConnection("X API v2")}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-slate-300" />
-                  <span>Probar API X</span>
-                </button>
+                {/* X Live Preview Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white shrink-0 font-bold">
+                      𝕏
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
+                        Cuenta Oficial de X (Twitter)
+                      </span>
+                      <strong className="text-sm text-white">
+                        {currentX ? `@${currentX}` : "No has configurado una cuenta de X todavía"}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {currentX ? (
+                    <a
+                      href={`https://x.com/${currentX}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all self-start sm:self-auto"
+                    >
+                      <span>Ver perfil x.com/{currentX}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-500 italic">Escribe el handle abajo para habilitar el enlace directo</span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Handle Oficial de X (con o sin @) *
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.xTwitter.handle}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          xTwitter: { ...socialState.xTwitter, handle: e.target.value },
+                        })
+                      }
+                      placeholder="ej: mercurycad_ar"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-slate-400 font-mono text-xs"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Nombre de usuario en X (Twitter): x.com/<strong>handle</strong>
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">API Key</label>
+                    <input
+                      type="text"
+                      value={socialState.xTwitter.apiKey}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          xTwitter: { ...socialState.xTwitter, apiKey: e.target.value },
+                        })
+                      }
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500 font-mono text-[11px]"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-slate-400 block mb-1">Bearer Token v2</label>
+                    <input
+                      type="password"
+                      value={socialState.xTwitter.bearerToken || ""}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          xTwitter: { ...socialState.xTwitter, bearerToken: e.target.value },
+                        })
+                      }
+                      placeholder="AAAA...bearer"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500 font-mono text-[11px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Save Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400">
+                    Al guardar, las menciones en X se sincronizarán con el CRM.
+                  </span>
+                  <button
+                    onClick={() => {
+                      onSaveSocialConfig(socialState);
+                      setSaveSuccess(true);
+                      setTimeout(() => setSaveSuccess(false), 3000);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 hover:from-slate-600 hover:to-slate-400 text-white font-bold text-xs shadow-lg shadow-slate-900/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Guardar Configuración de X (Twitter)</span>
+                  </button>
+                </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="text-slate-400 block mb-1">Handle Oficial de X</label>
-                  <input
-                    type="text"
-                    value={socialState.xTwitter.handle}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        xTwitter: { ...socialState.xTwitter, handle: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">API Key</label>
-                  <input
-                    type="text"
-                    value={socialState.xTwitter.apiKey}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        xTwitter: { ...socialState.xTwitter, apiKey: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500 font-mono text-[11px]"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="text-slate-400 block mb-1">Bearer Token v2</label>
-                  <input
-                    type="password"
-                    value={socialState.xTwitter.bearerToken || ""}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        xTwitter: { ...socialState.xTwitter, bearerToken: e.target.value },
-                      })
-                    }
-                    placeholder="AAAA...bearer"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-slate-500 font-mono text-[11px]"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB 5: GOOGLE REVIEWS */}
-          {activeSubTab === "google" && (
-            <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold">
-                    G
+          {activeSubTab === "google" && (() => {
+            const locId = socialState.googleBusiness.locationId || "loc_mendoza_mercury_cad";
+
+            return (
+              <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5 animate-in fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-base">
+                      G
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white flex items-center gap-2">
+                        Google Business Profile & Reseñas
+                        <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold">
+                          {locId}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Sincronización de opiniones y valoraciones de clientes en Google Maps y búsqueda.
+                      </p>
+                    </div>
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleTestConnection("Google Business API")}
+                      className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Probar API Google</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSaveSocialConfig(socialState);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
+                      }}
+                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs shadow-md shadow-amber-600/30 transition-all flex items-center gap-1.5 active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Guardar Google</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Google Live Search Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 font-bold">
+                      G
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-amber-300 font-semibold uppercase tracking-wider block">
+                        Ficha en Google Maps & Buscador
+                      </span>
+                      <strong className="text-sm text-white">
+                        Mercury CAD • 9 de Julio 3333, Mendoza
+                      </strong>
+                    </div>
+                  </div>
+
+                  <a
+                    href="https://www.google.com/search?q=Mercury+CAD+Mendoza"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600/30 hover:bg-amber-600/50 text-amber-200 border border-amber-500/50 text-xs font-semibold transition-all self-start sm:self-auto"
+                  >
+                    <span>Ver en Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <h3 className="text-sm font-bold text-white">
-                      Google Business Profile & Reseñas
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      Sincronización de opiniones y valoraciones de clientes en Google Maps y búsqueda.
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Google Location ID (Mendoza) *
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.googleBusiness.locationId}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          googleBusiness: { ...socialState.googleBusiness, locationId: e.target.value },
+                        })
+                      }
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-amber-500 font-mono text-xs"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Dirección vinculada: 9 de Julio 3333, Mendoza
                     </p>
                   </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">API Key / Place ID</label>
+                    <input
+                      type="password"
+                      value={socialState.googleBusiness.apiKey || ""}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          googleBusiness: { ...socialState.googleBusiness, apiKey: e.target.value },
+                        })
+                      }
+                      placeholder="AIzaSy..."
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-500 font-mono text-[11px]"
+                    />
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => handleTestConnection("Google Business API")}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Probar API Google</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="text-slate-400 block mb-1">Google Location ID (Mendoza)</label>
-                  <input
-                    type="text"
-                    value={socialState.googleBusiness.locationId}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        googleBusiness: { ...socialState.googleBusiness, locationId: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-500"
-                  />
-                  <p className="text-[10px] text-slate-500 mt-1">
-                    Dirección vinculada: 9 de Julio 3333, Mendoza
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">API Key / Place ID</label>
-                  <input
-                    type="password"
-                    value={socialState.googleBusiness.apiKey || ""}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        googleBusiness: { ...socialState.googleBusiness, apiKey: e.target.value },
-                      })
-                    }
-                    placeholder="AIzaSy..."
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-amber-500 font-mono text-[11px]"
-                  />
+                {/* Bottom Save Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400">
+                    Al guardar, las reseñas de Google se integrarán al módulo de opiniones del CRM.
+                  </span>
+                  <button
+                    onClick={() => {
+                      onSaveSocialConfig(socialState);
+                      setSaveSuccess(true);
+                      setTimeout(() => setSaveSuccess(false), 3000);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs shadow-lg shadow-amber-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Guardar Configuración de Google Business</span>
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB: WHATSAPP WEB BRIDGE */}
-          {activeSubTab === "whatsapp" && (
-            <div className="glass-panel border border-emerald-500/30 bg-emerald-950/10 rounded-3xl p-6 space-y-6 animate-in fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                    <MessageSquare className="w-5 h-5" />
+          {activeSubTab === "whatsapp" && (() => {
+            const currentPhone = socialState.whatsapp?.phoneNumber || "+54 9 261 468-2451";
+            const cleanDigits = currentPhone.replace(/\D/g, "");
+
+            return (
+              <div className="glass-panel border border-emerald-500/30 bg-emerald-950/10 rounded-3xl p-6 space-y-6 animate-in fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                      <MessageSquare className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white flex items-center gap-2">
+                        Puente WhatsApp Web (Extensión & Móvil)
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">
+                          {currentPhone}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Conecta tu WhatsApp Web abierto en tu PC con Mercury CRM en la nube sin costo y sin riesgo de baneo.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                      Puente WhatsApp Web (Extensión de Navegador)
-                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">
-                        Activo & Seguro
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleTestWhatsAppSync}
+                      disabled={isWaTesting}
+                      className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isWaTesting ? "animate-spin" : ""}`} />
+                      <span>{isWaTesting ? "Probando..." : "Simular Mensaje"}</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSaveSocialConfig(socialState);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
+                      }}
+                      className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all flex items-center gap-1.5 active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Guardar WhatsApp</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* WhatsApp Live Status Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/30 via-slate-900 to-slate-900 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-emerald-300 font-semibold uppercase tracking-wider block">
+                        Línea Oficial WhatsApp Mercury CAD
                       </span>
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Conecta tu WhatsApp Web abierto en tu PC con Mercury CRM en la nube sin costo y sin riesgo de baneo.
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleTestWhatsAppSync}
-                  disabled={isWaTesting}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isWaTesting ? "animate-spin" : ""}`} />
-                  <span>{isWaTesting ? "Probando..." : "Simular Mensaje Entrante"}</span>
-                </button>
-              </div>
-
-              {/* Live Test Alert */}
-              {waTestResponse && (
-                <div className="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/40 text-xs font-medium text-emerald-300 flex items-center gap-2">
-                  <span>{waTestResponse}</span>
-                </div>
-              )}
-
-              {/* Guía Paso a Paso de Instalación */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-emerald-400" />
-                  <span>Cómo instalar la extensión en Chrome o Edge (Solo 30 segundos)</span>
-                </h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  {/* Paso 1 */}
-                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-emerald-400">Paso 1</span>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono">Navegador</span>
+                      <strong className="text-sm text-white">
+                        {currentPhone}
+                      </strong>
                     </div>
-                    <p className="text-slate-300 font-medium">
-                      Abre en una pestaña nueva:
-                    </p>
-                    <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-200">
-                      <span>chrome://extensions</span>
-                      <button
-                        onClick={() => handleCopy("chrome://extensions", "url")}
-                        className="p-1 hover:text-emerald-400"
-                        title="Copiar"
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="https://web.whatsapp.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all"
+                    >
+                      <span>Abrir WhatsApp Web</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                    {cleanDigits && (
+                      <a
+                        href={`https://wa.me/${cleanDigits}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/50 text-xs font-semibold transition-all"
                       >
-                        {copiedText === "url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      Activa el interruptor <strong>"Modo de desarrollador"</strong> (esquina superior derecha).
+                        <span>Chat wa.me</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Live Test Alert */}
+                {waTestResponse && (
+                  <div className="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/40 text-xs font-medium text-emerald-300 flex items-center gap-2">
+                    <span>{waTestResponse}</span>
+                  </div>
+                )}
+
+                {/* Editable WhatsApp Line Phone & Token */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Teléfono Oficial de WhatsApp de Mercury CAD *
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.whatsapp?.phoneNumber || ""}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          whatsapp: {
+                            apiKey: socialState.whatsapp?.apiKey || "mercury_wa_sec_2026",
+                            endpointUrl: socialState.whatsapp?.endpointUrl || "/api/whatsapp/sync",
+                            active: true,
+                            autoSync: true,
+                            phoneNumber: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="+54 9 261 468-2451"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-emerald-500 font-mono text-xs"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Número con código de país para enlaces directos de atención al cliente.
                     </p>
                   </div>
 
-                  {/* Paso 2 */}
-                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-emerald-400">Paso 2</span>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono">Cargar Carpeta</span>
-                    </div>
-                    <p className="text-slate-300 font-medium">
-                      Clic en <strong>"Cargar descomprimida"</strong> y elige:
-                    </p>
-                    <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-200 truncate">
-                      <span className="truncate">c:\Proyectos\cmr\extension</span>
-                      <button
-                        onClick={() => handleCopy("c:\\Proyectos\\cmr\\extension", "path")}
-                        className="p-1 hover:text-emerald-400 shrink-0"
-                        title="Copiar ruta"
-                      >
-                        {copiedText === "path" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      La extensión <em>"Mercury CRM - WhatsApp Web Bridge"</em> quedará instalada de inmediato.
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      API Key de Autenticación de la Extensión *
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.whatsapp?.apiKey || "mercury_wa_sec_2026"}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          whatsapp: {
+                            apiKey: e.target.value,
+                            endpointUrl: socialState.whatsapp?.endpointUrl || "/api/whatsapp/sync",
+                            active: true,
+                            autoSync: true,
+                            phoneNumber: socialState.whatsapp?.phoneNumber,
+                          },
+                        })
+                      }
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono text-xs outline-none focus:border-emerald-500"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Token que debes ingresar en la extensión de Chrome / Edge.
                     </p>
                   </div>
+                </div>
 
-                  {/* Paso 3 */}
-                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-emerald-400">Paso 3</span>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono">Configurar</span>
+                {/* Guía Paso a Paso de Instalación */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-emerald-400" />
+                    <span>Cómo instalar la extensión en Chrome o Edge (Solo 30 segundos)</span>
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    {/* Paso 1 */}
+                    <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-emerald-400">Paso 1</span>
+                        <span className="text-[10px] text-slate-500 uppercase font-mono">Navegador</span>
+                      </div>
+                      <p className="text-slate-300 font-medium">
+                        Abre en una pestaña nueva:
+                      </p>
+                      <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-200">
+                        <span>chrome://extensions</span>
+                        <button
+                          onClick={() => handleCopy("chrome://extensions", "url")}
+                          className="p-1 hover:text-emerald-400"
+                          title="Copiar"
+                        >
+                          {copiedText === "url" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        Activa el interruptor <strong>"Modo de desarrollador"</strong> (esquina superior derecha).
+                      </p>
                     </div>
-                    <p className="text-slate-300 font-medium">
-                      En el ícono de la extensión ingresa tu API Key:
-                    </p>
-                    <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-300">
-                      <span>mercury_wa_sec_2026</span>
-                      <button
-                        onClick={() => handleCopy("mercury_wa_sec_2026", "key")}
-                        className="p-1 hover:text-emerald-400"
-                        title="Copiar token"
-                      >
-                        {copiedText === "key" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
+
+                    {/* Paso 2 */}
+                    <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-emerald-400">Paso 2</span>
+                        <span className="text-[10px] text-slate-500 uppercase font-mono">Cargar Carpeta</span>
+                      </div>
+                      <p className="text-slate-300 font-medium">
+                        Clic en <strong>"Cargar descomprimida"</strong> y elige:
+                      </p>
+                      <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-200 truncate">
+                        <span className="truncate">c:\Proyectos\cmr\extension</span>
+                        <button
+                          onClick={() => handleCopy("c:\\Proyectos\\cmr\\extension", "path")}
+                          className="p-1 hover:text-emerald-400 shrink-0"
+                          title="Copiar ruta"
+                        >
+                          {copiedText === "path" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        La extensión <em>"Mercury CRM - WhatsApp Web Bridge"</em> quedará instalada de inmediato.
+                      </p>
                     </div>
-                    <p className="text-[11px] text-slate-400">
-                      ¡Listo! Ya tienes conectado WhatsApp Web con el CRM.
-                    </p>
+
+                    {/* Paso 3 */}
+                    <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-emerald-400">Paso 3</span>
+                        <span className="text-[10px] text-slate-500 uppercase font-mono">Configurar</span>
+                      </div>
+                      <p className="text-slate-300 font-medium">
+                        En el ícono de la extensión ingresa tu API Key:
+                      </p>
+                      <div className="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-300">
+                        <span>{socialState.whatsapp?.apiKey || "mercury_wa_sec_2026"}</span>
+                        <button
+                          onClick={() => handleCopy(socialState.whatsapp?.apiKey || "mercury_wa_sec_2026", "key")}
+                          className="p-1 hover:text-emerald-400"
+                          title="Copiar token"
+                        >
+                          {copiedText === "key" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        ¡Listo! Ya tienes conectado WhatsApp Web con el CRM.
+                      </p>
+                    </div>
                   </div>
+                </div>
+
+                {/* Cómo usarlo con tus clientes */}
+                <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Cómo interactuar con tus clientes en WhatsApp Web</span>
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                      <div className="font-bold text-white mb-1 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-400" />
+                        1. Reconocimiento Automático
+                      </div>
+                      <p className="text-slate-400 leading-relaxed">
+                        Al abrir el chat de un cliente en <strong>web.whatsapp.com</strong>, el botón flotante <strong>"M"</strong> reconoce su número y te muestra su nombre, empresa, etapa y presupuesto.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                      <div className="font-bold text-white mb-1 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        2. Sincronización en 1 Clic
+                      </div>
+                      <p className="text-slate-400 leading-relaxed">
+                        Haz clic en <strong>"📥 Sincronizar Conversación"</strong> para guardar las respuestas del cliente directamente en la ficha del CRM sin tener que copiar y pegar a mano.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                      <div className="font-bold text-white mb-1 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-purple-400" />
+                        3. Alta de Nuevos Prospectos
+                      </div>
+                      <p className="text-slate-400 leading-relaxed">
+                        Si te escribe un contacto desconocido, el panel te ofrecerá el botón <strong>"+ Crear Lead en Mercury CAD"</strong> para registrarlo al instante.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom WhatsApp Save Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400">
+                    Al guardar, la línea oficial y la clave de la extensión quedarán aseguradas en el CRM.
+                  </span>
+                  <button
+                    onClick={() => {
+                      onSaveSocialConfig(socialState);
+                      setSaveSuccess(true);
+                      setTimeout(() => setSaveSuccess(false), 3000);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Guardar Configuración de WhatsApp</span>
+                  </button>
                 </div>
               </div>
-
-              {/* Cómo usarlo con tus clientes */}
-              <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Cómo interactuar con tus clientes en WhatsApp Web</span>
-                </h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                    <div className="font-bold text-white mb-1 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-400" />
-                      1. Reconocimiento Automático
-                    </div>
-                    <p className="text-slate-400 leading-relaxed">
-                      Al abrir el chat de un cliente en <strong>web.whatsapp.com</strong>, el botón flotante <strong>"M"</strong> reconoce su número y te muestra su nombre, empresa, etapa y presupuesto.
-                    </p>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                    <div className="font-bold text-white mb-1 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                      2. Sincronización en 1 Clic
-                    </div>
-                    <p className="text-slate-400 leading-relaxed">
-                      Haz clic en <strong>"📥 Sincronizar Conversación"</strong> para guardar las respuestas del cliente directamente en la ficha del CRM sin tener que copiar y pegar a mano.
-                    </p>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                    <div className="font-bold text-white mb-1 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-purple-400" />
-                      3. Alta de Nuevos Prospectos
-                    </div>
-                    <p className="text-slate-400 leading-relaxed">
-                      Si te escribe un contacto desconocido, el panel te ofrecerá el botón <strong>"+ Crear Lead en Mercury CAD"</strong> para registrarlo al instante.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Endpoints & Security Parameters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="text-slate-400 block mb-1">Ruta de la API Webhook en el CRM</label>
-                  <input
-                    type="text"
-                    readOnly
-                    value="/api/whatsapp/sync"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-emerald-300 font-mono text-[11px] outline-none"
-                  />
-                  <p className="text-[10px] text-slate-500 mt-1">
-                    Endpoint seguro con soporte CORS para llamadas desde WhatsApp Web.
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">API Key de Autenticación</label>
-                  <input
-                    type="text"
-                    value={socialState.whatsapp?.apiKey || "mercury_wa_sec_2026"}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        whatsapp: {
-                          apiKey: e.target.value,
-                          active: true,
-                          autoSync: true,
-                        },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono text-[11px] outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </div>

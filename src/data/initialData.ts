@@ -138,6 +138,7 @@ export const DEFAULT_SOCIAL_CONFIG: SocialChannelsConfig = {
     endpointUrl: "/api/whatsapp/sync",
     active: true,
     autoSync: true,
+    phoneNumber: "+54 9 261 468-2451",
   },
 };
 

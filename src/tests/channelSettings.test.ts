@@ -67,22 +67,61 @@ describe("4. Módulo Configuración de Canales (Correo Mercury CAD & Redes)", ()
     expect(DEFAULT_SOCIAL_CONFIG.linkedIn.orgId).toBe("mercury-creation-and-design");
     expect(DEFAULT_SOCIAL_CONFIG.xTwitter.handle).toBe("@mercurycad_ar");
     expect(DEFAULT_SOCIAL_CONFIG.googleBusiness.locationId).toBe("loc_mendoza_mercury_cad");
+    expect(DEFAULT_SOCIAL_CONFIG.whatsapp?.phoneNumber).toBe("+54 9 261 468-2451");
   });
 
-  it("permite modificar y guardar la cuenta de Instagram de la agencia", () => {
+  it("permite modificar y guardar todas las redes sociales oficiales de la agencia", () => {
     const updatedSocial: SocialChannelsConfig = {
       ...DEFAULT_SOCIAL_CONFIG,
       meta: {
         ...DEFAULT_SOCIAL_CONFIG.meta,
         instagramAccountId: "mercury_nueva_cuenta",
+        pageId: "mercury_fb_oficial",
+      },
+      linkedIn: {
+        ...DEFAULT_SOCIAL_CONFIG.linkedIn,
+        orgId: "mercury-agency-global",
+      },
+      xTwitter: {
+        ...DEFAULT_SOCIAL_CONFIG.xTwitter,
+        handle: "mercury_tech_ar",
+      },
+      googleBusiness: {
+        ...DEFAULT_SOCIAL_CONFIG.googleBusiness,
+        locationId: "loc_mendoza_sucursal_centro",
+      },
+      whatsapp: {
+        ...DEFAULT_SOCIAL_CONFIG.whatsapp!,
+        phoneNumber: "+54 9 261 555-7788",
+        apiKey: "new_wa_token_2026",
       },
     };
+
+    // Instagram & Facebook
     expect(updatedSocial.meta.instagramAccountId).toBe("mercury_nueva_cuenta");
+    expect(updatedSocial.meta.pageId).toBe("mercury_fb_oficial");
     const cleanIg = updatedSocial.meta.instagramAccountId.trim().replace(/^@/, "");
     expect(`https://instagram.com/${cleanIg}`).toBe("https://instagram.com/mercury_nueva_cuenta");
+    expect(`https://facebook.com/${updatedSocial.meta.pageId}`).toBe("https://facebook.com/mercury_fb_oficial");
+
+    // LinkedIn
+    expect(updatedSocial.linkedIn.orgId).toBe("mercury-agency-global");
+    expect(`https://linkedin.com/company/${updatedSocial.linkedIn.orgId}`).toBe("https://linkedin.com/company/mercury-agency-global");
+
+    // X (Twitter)
+    expect(updatedSocial.xTwitter.handle).toBe("mercury_tech_ar");
+    const cleanX = updatedSocial.xTwitter.handle.trim().replace(/^@/, "");
+    expect(`https://x.com/${cleanX}`).toBe("https://x.com/mercury_tech_ar");
+
+    // Google Business
+    expect(updatedSocial.googleBusiness.locationId).toBe("loc_mendoza_sucursal_centro");
+
+    // WhatsApp
+    expect(updatedSocial.whatsapp?.phoneNumber).toBe("+54 9 261 555-7788");
+    expect(updatedSocial.whatsapp?.apiKey).toBe("new_wa_token_2026");
   });
 
-  it("permite asignar y modificar la cuenta de Instagram en la ficha del prospecto/lead", () => {
+  it("permite asignar y modificar todas las redes sociales en la ficha del prospecto/lead", () => {
     const mockLead = {
       id: "lead-test",
       nombre: "Gabriel Test",
@@ -91,17 +130,42 @@ describe("4. Módulo Configuración de Canales (Correo Mercury CAD & Redes)", ()
       telefono: "+54 9 261 111-2222",
       instagramHandle: "@empresa_mendoza",
       instagramUrl: "https://instagram.com/empresa_mendoza",
+      linkedinUrl: "https://linkedin.com/company/empresa-mendoza",
+      facebookHandle: "empresamendoza.fb",
+      facebookUrl: "https://facebook.com/empresamendoza.fb",
+      twitterHandle: "empresamza",
+      twitterUrl: "https://x.com/empresamza",
+      websiteUrl: "https://empresamendoza.com.ar",
     };
-    expect(mockLead.instagramHandle).toBe("@empresa_mendoza");
-    expect(mockLead.instagramUrl).toBe("https://instagram.com/empresa_mendoza");
 
-    // Simular edición de Instagram
+    expect(mockLead.instagramHandle).toBe("@empresa_mendoza");
+    expect(mockLead.linkedinUrl).toContain("empresa-mendoza");
+    expect(mockLead.facebookHandle).toBe("empresamendoza.fb");
+    expect(mockLead.twitterHandle).toBe("empresamza");
+    expect(mockLead.websiteUrl).toBe("https://empresamendoza.com.ar");
+
+    // Simular edición completa de todas las redes del prospecto
     const modifiedLead = {
       ...mockLead,
-      instagramHandle: "empresa_mendoza_nuevo",
-      instagramUrl: "https://instagram.com/empresa_mendoza_nuevo",
+      telefono: "+54 9 261 999-8877",
+      instagramHandle: "nueva_cuenta_ig",
+      instagramUrl: "https://instagram.com/nueva_cuenta_ig",
+      linkedinUrl: "https://linkedin.com/company/nueva-empresa",
+      facebookHandle: "nueva.empresa.fb",
+      facebookUrl: "https://facebook.com/nueva.empresa.fb",
+      twitterHandle: "nueva_empresa_x",
+      twitterUrl: "https://x.com/nueva_empresa_x",
+      websiteUrl: "https://nuevaempresa.com",
     };
-    expect(modifiedLead.instagramHandle).toBe("empresa_mendoza_nuevo");
-    expect(modifiedLead.instagramUrl).toContain("empresa_mendoza_nuevo");
+
+    expect(modifiedLead.telefono).toBe("+54 9 261 999-8877");
+    expect(modifiedLead.instagramHandle).toBe("nueva_cuenta_ig");
+    expect(modifiedLead.instagramUrl).toBe("https://instagram.com/nueva_cuenta_ig");
+    expect(modifiedLead.linkedinUrl).toBe("https://linkedin.com/company/nueva-empresa");
+    expect(modifiedLead.facebookHandle).toBe("nueva.empresa.fb");
+    expect(modifiedLead.facebookUrl).toBe("https://facebook.com/nueva.empresa.fb");
+    expect(modifiedLead.twitterHandle).toBe("nueva_empresa_x");
+    expect(modifiedLead.twitterUrl).toBe("https://x.com/nueva_empresa_x");
+    expect(modifiedLead.websiteUrl).toBe("https://nuevaempresa.com");
   });
 });

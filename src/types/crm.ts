@@ -97,6 +97,10 @@ export interface Lead {
   websiteUrl?: string;
   instagramHandle?: string;
   instagramUrl?: string;
+  facebookHandle?: string;
+  facebookUrl?: string;
+  twitterHandle?: string;
+  twitterUrl?: string;
   asignadoAId?: string;
   asignadoANombre?: string;
   creadoPorId?: string;
@@ -175,6 +179,7 @@ export interface SocialChannelsConfig {
     endpointUrl?: string;
     active: boolean;
     autoSync: boolean;
+    phoneNumber?: string;
   };
 }
 
