@@ -63,6 +63,7 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
   const [empresa, setEmpresa] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [instagramHandle, setInstagramHandle] = useState("");
   const [servicioInteres, setServicioInteres] = useState<ServiceType>("UX_UI");
   const [valorEstimado, setValorEstimado] = useState<number>(2500);
   const [origen, setOrigen] = useState<Lead["origen"]>("Web MercuryCAD");
@@ -121,11 +122,12 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
   const handleLinkInstagram = () => {
     if (!suggestions) return;
     setOrigen("Instagram DM");
+    setInstagramHandle(`@${suggestions.instagramHandle}`);
     const tag = `Red: Instagram@${suggestions.instagramHandle}.`;
     if (!notas.includes(tag)) {
       setNotas((prev) => (prev ? `${prev} | ${tag}` : tag));
     }
-    showFeedback("Canal Instagram vinculado al prospecto.");
+    showFeedback(`Cuenta de Instagram @${suggestions.instagramHandle} vinculada al prospecto.`);
   };
 
   // Quick Action: Apply Corporate Domain to Email
@@ -191,12 +193,15 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
     }
 
     const assignedUser = users.find((u) => u.id === assignedUserId) || currentUser;
+    const cleanIg = instagramHandle.trim().replace(/^@/, "");
     const newLead: Lead = {
       id: `lead-${Date.now()}`,
       nombre: nombre.trim() || empresa.trim(),
       empresa: empresa.trim() || nombre.trim(),
       email: email.trim() || `contacto@${suggestions?.candidateDomains[0] || "empresa.com.ar"}`,
       telefono: telefono.trim() || "+54 261 400-0000",
+      instagramHandle: cleanIg ? `@${cleanIg}` : undefined,
+      instagramUrl: cleanIg ? `https://www.instagram.com/${cleanIg}/` : undefined,
       servicioInteres,
       estado: "NUEVO",
       valorEstimado,
@@ -425,6 +430,23 @@ export const NewLeadModal: React.FC<NewLeadModalProps> = ({
                       value={telefono}
                       onChange={(e) => setTelefono(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-blue-500 text-xs"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-slate-300 block mb-1 font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white text-[10px] flex items-center justify-center font-bold">IG</span>
+                        <span>Cuenta de Instagram del Prospecto</span>
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-normal">Opcional</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ej. @bodeganorton o https://instagram.com/..."
+                      value={instagramHandle}
+                      onChange={(e) => setInstagramHandle(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 text-xs placeholder-slate-600 font-medium"
                     />
                   </div>
                 </div>

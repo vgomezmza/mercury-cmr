@@ -60,7 +60,7 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
-  // Check saved session on mount
+  // Check saved session and configurations on mount
   useEffect(() => {
     try {
       const savedUserStr = localStorage.getItem("mercurycad_active_user");
@@ -72,6 +72,33 @@ export default function Home() {
           setCurrentUser(valid);
         } else {
           localStorage.removeItem("mercurycad_active_user");
+        }
+      }
+
+      const savedSocial = localStorage.getItem("mercurycad_social_config");
+      if (savedSocial) {
+        try {
+          setSocialConfig(JSON.parse(savedSocial));
+        } catch (e) {
+          console.error("Error parsing saved social config:", e);
+        }
+      }
+
+      const savedEmail = localStorage.getItem("mercurycad_email_config");
+      if (savedEmail) {
+        try {
+          setEmailConfig(JSON.parse(savedEmail));
+        } catch (e) {
+          console.error("Error parsing saved email config:", e);
+        }
+      }
+
+      const savedLeads = localStorage.getItem("mercurycad_leads_db");
+      if (savedLeads) {
+        try {
+          setLeads(JSON.parse(savedLeads));
+        } catch (e) {
+          console.error("Error parsing saved leads db:", e);
         }
       }
     } catch (e) {
@@ -186,16 +213,29 @@ export default function Home() {
     showToast("Usuario eliminado del sistema.");
   };
 
+  // Helper to persist leads to localStorage
+  const updateAndPersistLeads = (updater: Lead[] | ((prev: Lead[]) => Lead[])) => {
+    setLeads((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      try {
+        localStorage.setItem("mercurycad_leads_db", JSON.stringify(next));
+      } catch (e) {
+        console.error("Error saving leads to localStorage:", e);
+      }
+      return next;
+    });
+  };
+
   // Lead actions
   const handleUpdateLeadStatus = (id: string, newStatus: LeadStatus) => {
-    setLeads((prev) =>
+    updateAndPersistLeads((prev) =>
       prev.map((l) => (l.id === id ? { ...l, estado: newStatus } : l))
     );
     showToast(`Lead actualizado a la etapa: ${newStatus.replace("_", " ")}`);
   };
 
   const handleUpdateLead = (updatedLead: Lead) => {
-    setLeads((prev) =>
+    updateAndPersistLeads((prev) =>
       prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
     );
     setSelectedLead(updatedLead);
@@ -203,7 +243,7 @@ export default function Home() {
   };
 
   const handleSaveNewLead = (newLead: Lead) => {
-    setLeads((prev) => [newLead, ...prev]);
+    updateAndPersistLeads((prev) => [newLead, ...prev]);
     setSelectedLead(newLead);
     setSelectedLeadTab("guide");
     showToast(`¡Cliente potencial registrado! Iniciando guía paso a paso al cierre.`);
@@ -243,7 +283,7 @@ export default function Home() {
   };
 
   const handleAssignLead = (leadId: string, assignedUserId: string, assignedUserName: string) => {
-    setLeads((prev) =>
+    updateAndPersistLeads((prev) =>
       prev.map((l) =>
         l.id === leadId
           ? {
@@ -255,6 +295,27 @@ export default function Home() {
       )
     );
     showToast(`Cliente asignado a ${assignedUserName}.`);
+  };
+
+  // Channel and social configs persistence handlers
+  const handleSaveEmailConfig = (newCfg: EmailChannelConfig) => {
+    setEmailConfig(newCfg);
+    try {
+      localStorage.setItem("mercurycad_email_config", JSON.stringify(newCfg));
+    } catch (e) {
+      console.error("Error saving email config:", e);
+    }
+    showToast("Configuración de correo Mercury CAD actualizada.");
+  };
+
+  const handleSaveSocialConfig = (newCfg: SocialChannelsConfig) => {
+    setSocialConfig(newCfg);
+    try {
+      localStorage.setItem("mercurycad_social_config", JSON.stringify(newCfg));
+    } catch (e) {
+      console.error("Error saving social config:", e);
+    }
+    showToast("Credenciales de redes sociales y canales actualizadas.");
   };
 
   // Social feed actions
@@ -583,14 +644,8 @@ export default function Home() {
           <ChannelSettings
             emailConfig={emailConfig}
             socialConfig={socialConfig}
-            onSaveEmailConfig={(newCfg) => {
-              setEmailConfig(newCfg);
-              showToast("Configuración de correo Mercury CAD actualizada.");
-            }}
-            onSaveSocialConfig={(newCfg) => {
-              setSocialConfig(newCfg);
-              showToast("Credenciales de redes sociales actualizadas.");
-            }}
+            onSaveEmailConfig={handleSaveEmailConfig}
+            onSaveSocialConfig={handleSaveSocialConfig}
           />
         )}
 

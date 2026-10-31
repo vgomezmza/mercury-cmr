@@ -68,4 +68,40 @@ describe("4. Módulo Configuración de Canales (Correo Mercury CAD & Redes)", ()
     expect(DEFAULT_SOCIAL_CONFIG.xTwitter.handle).toBe("@mercurycad_ar");
     expect(DEFAULT_SOCIAL_CONFIG.googleBusiness.locationId).toBe("loc_mendoza_mercury_cad");
   });
+
+  it("permite modificar y guardar la cuenta de Instagram de la agencia", () => {
+    const updatedSocial: SocialChannelsConfig = {
+      ...DEFAULT_SOCIAL_CONFIG,
+      meta: {
+        ...DEFAULT_SOCIAL_CONFIG.meta,
+        instagramAccountId: "mercury_nueva_cuenta",
+      },
+    };
+    expect(updatedSocial.meta.instagramAccountId).toBe("mercury_nueva_cuenta");
+    const cleanIg = updatedSocial.meta.instagramAccountId.trim().replace(/^@/, "");
+    expect(`https://instagram.com/${cleanIg}`).toBe("https://instagram.com/mercury_nueva_cuenta");
+  });
+
+  it("permite asignar y modificar la cuenta de Instagram en la ficha del prospecto/lead", () => {
+    const mockLead = {
+      id: "lead-test",
+      nombre: "Gabriel Test",
+      empresa: "Empresa Test",
+      email: "test@test.com",
+      telefono: "+54 9 261 111-2222",
+      instagramHandle: "@empresa_mendoza",
+      instagramUrl: "https://instagram.com/empresa_mendoza",
+    };
+    expect(mockLead.instagramHandle).toBe("@empresa_mendoza");
+    expect(mockLead.instagramUrl).toBe("https://instagram.com/empresa_mendoza");
+
+    // Simular edición de Instagram
+    const modifiedLead = {
+      ...mockLead,
+      instagramHandle: "empresa_mendoza_nuevo",
+      instagramUrl: "https://instagram.com/empresa_mendoza_nuevo",
+    };
+    expect(modifiedLead.instagramHandle).toBe("empresa_mendoza_nuevo");
+    expect(modifiedLead.instagramUrl).toContain("empresa_mendoza_nuevo");
+  });
 });

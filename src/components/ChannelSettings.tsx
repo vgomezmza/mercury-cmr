@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { EmailChannelConfig, SocialChannelsConfig } from "../types/crm";
 import { validateWhatsAppSync } from "../lib/whatsappBridge";
 import {
@@ -46,6 +46,15 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
   // Local form states
   const [emailState, setEmailState] = useState<EmailChannelConfig>(emailConfig);
   const [socialState, setSocialState] = useState<SocialChannelsConfig>(socialConfig);
+
+  // Keep in sync with parent props
+  useEffect(() => {
+    setEmailState(emailConfig);
+  }, [emailConfig]);
+
+  useEffect(() => {
+    setSocialState(socialConfig);
+  }, [socialConfig]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [testingStatus, setTestingStatus] = useState<string | null>(null);
@@ -149,6 +158,70 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
+  const cleanIg = (socialState.meta?.instagramAccountId || "")
+    .trim()
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
+    .replace(/\/$/, "");
+
+  const navItems = [
+    {
+      id: "whatsapp" as const,
+      label: "WhatsApp Web Bridge",
+      shortLabel: "WhatsApp Web",
+      desc: "Extensión Chrome / PC",
+      icon: MessageSquare,
+      activeColor: "border-emerald-500 bg-emerald-950/40 text-emerald-400",
+      badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    },
+    {
+      id: "meta" as const,
+      label: "Meta (Instagram & Facebook)",
+      shortLabel: "Instagram & Meta",
+      desc: cleanIg ? `@${cleanIg}` : "@configurar_cuenta",
+      icon: Share2,
+      activeColor: "border-pink-500 bg-pink-950/40 text-pink-400",
+      badgeColor: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+      extraBadge: cleanIg ? `@${cleanIg}` : undefined,
+    },
+    {
+      id: "email" as const,
+      label: "Correo Mercury CAD",
+      shortLabel: "Correo Oficial",
+      desc: emailState.email || "info@mercurycad.com.ar",
+      icon: Mail,
+      activeColor: "border-blue-500 bg-blue-950/40 text-blue-400",
+      badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    },
+    {
+      id: "linkedin" as const,
+      label: "LinkedIn Company",
+      shortLabel: "LinkedIn",
+      desc: socialState.linkedIn?.orgId || "Prospección B2B",
+      icon: Globe,
+      activeColor: "border-sky-500 bg-sky-950/40 text-sky-400",
+      badgeColor: "bg-sky-500/20 text-sky-400 border-sky-500/30",
+    },
+    {
+      id: "x" as const,
+      label: "X (Twitter) API v2",
+      shortLabel: "X / Twitter",
+      desc: socialState.xTwitter?.handle || "@mercurycad_ar",
+      icon: Radio,
+      activeColor: "border-slate-500 bg-slate-800/60 text-slate-200",
+      badgeColor: "bg-slate-700/40 text-slate-200 border-slate-600/30",
+    },
+    {
+      id: "google" as const,
+      label: "Google Business & Reviews",
+      shortLabel: "Google Reviews",
+      desc: "Reseñas de Clientes 5★",
+      icon: Sparkles,
+      activeColor: "border-amber-500 bg-amber-950/40 text-amber-400",
+      badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Top Banner */}
@@ -188,70 +261,56 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
         </div>
       )}
 
+      {/* Top Horizontal Quick Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isSelected = activeSubTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveSubTab(item.id)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 border transition-all ${
+                isSelected
+                  ? `${item.activeColor} shadow-md`
+                  : "bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{item.shortLabel}</span>
+              {item.extraBadge && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 font-mono">
+                  {item.extraBadge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Tabs and Form Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Sub-Navigation */}
         <div className="space-y-2">
-          {[
-            {
-              id: "whatsapp",
-              label: "WhatsApp Web Bridge",
-              desc: "Extensión Chrome / PC",
-              icon: MessageSquare,
-              activeColor: "border-emerald-500 bg-emerald-950/40 text-emerald-400",
-            },
-            {
-              id: "email",
-              label: "Correo Mercury CAD",
-              desc: "info@mercurycad.com.ar",
-              icon: Mail,
-              activeColor: "border-blue-500 bg-blue-950/40 text-blue-400",
-            },
-            {
-              id: "meta",
-              label: "Meta (Instagram & Facebook)",
-              desc: "@mercurycreationandesign",
-              icon: Share2,
-              activeColor: "border-pink-500 bg-pink-950/40 text-pink-400",
-            },
-            {
-              id: "linkedin",
-              label: "LinkedIn Company",
-              desc: "Prospección & Menciones B2B",
-              icon: Globe,
-              activeColor: "border-sky-500 bg-sky-950/40 text-sky-400",
-            },
-            {
-              id: "x",
-              label: "X (Twitter) API v2",
-              desc: "@mercurycad_ar",
-              icon: Radio,
-              activeColor: "border-slate-500 bg-slate-800/60 text-slate-200",
-            },
-            {
-              id: "google",
-              label: "Google Business & Reviews",
-              desc: "Reseñas de Clientes 5★",
-              icon: Sparkles,
-              activeColor: "border-amber-500 bg-amber-950/40 text-amber-400",
-            },
-          ].map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const isSelected = activeSubTab === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveSubTab(item.id as any)}
+                onClick={() => setActiveSubTab(item.id)}
                 className={`w-full p-3.5 rounded-2xl text-left border transition-all flex items-start gap-3 ${
                   isSelected
                     ? `${item.activeColor} shadow-md`
                     : "border-slate-800 bg-slate-900/40 text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
                 }`}
               >
-                <Icon className="w-5 h-5 mt-0.5" />
-                <div>
-                  <h4 className="text-xs font-bold text-white">{item.label}</h4>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{item.desc}</p>
+                <Icon className="w-5 h-5 mt-0.5 shrink-0" />
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="text-xs font-bold text-white truncate">{item.label}</h4>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-0.5 truncate">{item.desc}</p>
                 </div>
               </button>
             );
@@ -419,99 +478,185 @@ export const ChannelSettings: React.FC<ChannelSettingsProps> = ({
           )}
 
           {/* TAB 2: META (FACEBOOK & INSTAGRAM) */}
-          {activeSubTab === "meta" && (
-            <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-pink-600/20 border border-pink-500/30 flex items-center justify-center text-pink-400 font-bold">
-                    IG
+          {activeSubTab === "meta" && (() => {
+            const currentIg = (socialState.meta?.instagramAccountId || "")
+              .trim()
+              .replace(/^@/, "")
+              .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
+              .replace(/\/$/, "");
+
+            return (
+              <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-5 animate-in fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 p-0.5 flex items-center justify-center">
+                      <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-pink-400 font-bold text-sm">
+                        IG
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white flex items-center gap-2">
+                        Meta Graph API & Instagram Business
+                        <span className="text-[10px] bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2 py-0.5 rounded-full font-semibold">
+                          {currentIg ? `@${currentIg}` : "Sin vincular"}
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {currentIg
+                          ? `Conectado a @${currentIg} para leer comentarios, DMs y opiniones de publicaciones.`
+                          : "Configura el usuario de Instagram oficial para monitorear publicaciones y mensajes."}
+                      </p>
+                    </div>
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleTestConnection("Meta Graph API (Facebook e Instagram)")}
+                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-pink-400" />
+                      <span>Probar Conexión</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSaveSocialConfig(socialState);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
+                      }}
+                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-md shadow-pink-600/30 transition-all flex items-center gap-1.5 active:scale-95"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Guardar Instagram</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Instagram Live Preview Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-950/30 via-purple-950/20 to-slate-900 border border-pink-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-pink-600/20 border border-pink-500/40 flex items-center justify-center text-pink-400 shrink-0">
+                      <Share2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-pink-300 font-semibold uppercase tracking-wider block">
+                        Perfil Activo de Instagram
+                      </span>
+                      <strong className="text-sm text-white">
+                        {currentIg ? `@${currentIg}` : "No has configurado una cuenta de Instagram todavía"}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {currentIg ? (
+                    <a
+                      href={`https://instagram.com/${currentIg}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-600/30 hover:bg-pink-600/50 text-pink-200 border border-pink-500/50 text-xs font-semibold transition-all self-start sm:self-auto"
+                    >
+                      <span>Ver perfil instagram.com/{currentIg}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-500 italic">Escribe el usuario abajo para habilitar el enlace directo</span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <h3 className="text-sm font-bold text-white">
-                      Meta Graph API (Instagram & Facebook)
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      Conecta @mercurycreationandesign para leer comentarios, DMs y opiniones de publicaciones.
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Cuenta Oficial de Instagram (Usuario o @handle) *
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.meta.instagramAccountId}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          meta: { ...socialState.meta, instagramAccountId: e.target.value },
+                        })
+                      }
+                      placeholder="ej: mercurycreationandesign"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-pink-500 font-mono text-xs"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Ingresa el nombre de usuario de Instagram oficial. Puedes colocarlo con o sin @.
                     </p>
                   </div>
+
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Facebook Page ID / Handle Oficial
+                    </label>
+                    <input
+                      type="text"
+                      value={socialState.meta.pageId}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          meta: { ...socialState.meta, pageId: e.target.value },
+                        })
+                      }
+                      placeholder="ej: mercurycreationandesign"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white outline-none focus:border-pink-500 font-mono text-xs"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Página de Facebook vinculada a la cuenta de Instagram.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">Meta App ID (Facebook Developers)</label>
+                    <input
+                      type="text"
+                      value={socialState.meta.appId}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          meta: { ...socialState.meta, appId: e.target.value },
+                        })
+                      }
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 font-mono text-[11px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">Page Access Token (Larga Duración)</label>
+                    <input
+                      type="password"
+                      value={socialState.meta.pageToken || ""}
+                      onChange={(e) =>
+                        setSocialState({
+                          ...socialState,
+                          meta: { ...socialState.meta, pageToken: e.target.value },
+                        })
+                      }
+                      placeholder="EAAX...token"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 font-mono text-[11px]"
+                    />
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => handleTestConnection("Meta Graph API (Facebook e Instagram)")}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-pink-400" />
-                  <span>Probar API Meta</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="text-slate-400 block mb-1">Instagram Business Account</label>
-                  <input
-                    type="text"
-                    value={socialState.meta.instagramAccountId}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        meta: { ...socialState.meta, instagramAccountId: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500"
-                  />
-                  <p className="text-[10px] text-slate-500 mt-1">
-                    Cuenta: https://instagram.com/mercurycreationandesign
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">Facebook Page ID / Handle</label>
-                  <input
-                    type="text"
-                    value={socialState.meta.pageId}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        meta: { ...socialState.meta, pageId: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">Meta App ID</label>
-                  <input
-                    type="text"
-                    value={socialState.meta.appId}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        meta: { ...socialState.meta, appId: e.target.value },
-                      })
-                    }
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 font-mono text-[11px]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-slate-400 block mb-1">Page Access Token (Larga Duración)</label>
-                  <input
-                    type="password"
-                    value={socialState.meta.pageToken || ""}
-                    onChange={(e) =>
-                      setSocialState({
-                        ...socialState,
-                        meta: { ...socialState.meta, pageToken: e.target.value },
-                      })
-                    }
-                    placeholder="EAAX...token"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none focus:border-pink-500 font-mono text-[11px]"
-                  />
+                {/* Bottom Save Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400">
+                    Al guardar, los datos de Instagram de Mercury CAD se sincronizarán en tiempo real.
+                  </span>
+                  <button
+                    onClick={() => {
+                      onSaveSocialConfig(socialState);
+                      setSaveSuccess(true);
+                      setTimeout(() => setSaveSuccess(false), 3000);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-pink-600/30 transition-all flex items-center gap-2 self-start sm:self-auto active:scale-95"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Guardar Configuración de Instagram</span>
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB 3: LINKEDIN */}
           {activeSubTab === "linkedin" && (

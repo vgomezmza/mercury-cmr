@@ -59,30 +59,43 @@ export function isCorporateEmail(email: string): boolean {
 }
 
 export function generateVerificationLinks(lead: Lead): VerificationLinks {
-  const handle = extractSocialHandle(lead.notas);
+  const extracted = extractSocialHandle(lead.notas);
+  const handle = lead.instagramHandle || extracted || "";
   const domain = extractDomain(lead.email);
 
   const cleanHandle = handle ? handle.replace(/^@/, "").trim() : "";
   const encodedNameCompany = encodeURIComponent(`${lead.nombre} ${lead.empresa}`);
   const encodedCompany = encodeURIComponent(`${lead.empresa} Mendoza`);
 
+  // Direct Instagram link
+  let instagramUrl = lead.instagramUrl;
+  if (!instagramUrl && cleanHandle) {
+    instagramUrl = `https://www.instagram.com/${cleanHandle}/`;
+  } else if (!instagramUrl) {
+    instagramUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(lead.empresa.replace(/\s+/g, "").toLowerCase())}/`;
+  } else if (!instagramUrl.startsWith("http")) {
+    instagramUrl = `https://www.instagram.com/${instagramUrl.replace(/^@/, "")}/`;
+  }
+
   return {
     socialHandle: cleanHandle || undefined,
     // LinkedIn company page and executive search
-    linkedinCompanyUrl: cleanHandle
-      ? `https://www.linkedin.com/company/${cleanHandle}`
-      : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(lead.empresa)}`,
+    linkedinCompanyUrl: lead.linkedinUrl
+      ? (lead.linkedinUrl.startsWith("http") ? lead.linkedinUrl : `https://${lead.linkedinUrl}`)
+      : (cleanHandle
+          ? `https://www.linkedin.com/company/${cleanHandle}`
+          : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(lead.empresa)}`),
     linkedinPersonSearchUrl: `https://www.linkedin.com/search/results/all/?keywords=${encodedNameCompany}`,
     // Instagram
-    instagramSearchUrl: cleanHandle
-      ? `https://www.instagram.com/${cleanHandle}/`
-      : `https://www.instagram.com/explore/tags/${encodeURIComponent(lead.empresa.replace(/\s+/g, "").toLowerCase())}/`,
+    instagramSearchUrl: instagramUrl,
     // X (Twitter)
     xSearchUrl: `https://x.com/search?q=${encodedCompany}&f=user`,
     // Facebook
     facebookSearchUrl: `https://www.facebook.com/search/top?q=${encodedCompany}`,
     // Official Website
-    websiteUrl: domain ? `https://${domain}` : undefined,
+    websiteUrl: lead.websiteUrl
+      ? (lead.websiteUrl.startsWith("http") ? lead.websiteUrl : `https://${lead.websiteUrl}`)
+      : (domain ? `https://${domain}` : undefined),
     // Google Business / News
     googleCompanyUrl: `https://www.google.com/search?q=${encodeURIComponent(`${lead.empresa} ${lead.nombre} Mendoza`)}`,
     // CUIT / AFIP Registry search

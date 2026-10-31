@@ -95,6 +95,8 @@ export interface Lead {
   verificacionNotas?: string;
   linkedinUrl?: string;
   websiteUrl?: string;
+  instagramHandle?: string;
+  instagramUrl?: string;
   asignadoAId?: string;
   asignadoANombre?: string;
   creadoPorId?: string;
