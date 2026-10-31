@@ -311,22 +311,7 @@ export default function Home() {
     showToast("Respuesta oficial registrada y enviada al canal del cliente.");
   };
 
-  // If session is checking, show smooth branded loader
-  if (isAuthChecking) {
-    return (
-      <div className="min-h-screen bg-[#030212] flex flex-col items-center justify-center gap-3 fondo-espacial">
-        <div className="w-10 h-10 border-2 border-[#375EFB] border-t-transparent rounded-full animate-spin shadow-lg shadow-[#375EFB]/30" />
-        <span className="text-xs text-[#C0C1E6] font-medium font-poppins">Iniciando Mercury CRM...</span>
-      </div>
-    );
-  }
-
-  // If no authenticated user, show login screen
-  if (!currentUser) {
-    return <LoginScreen users={users} onLogin={handleLogin} />;
-  }
-
-  // Filter leads visible to the user based on RBAC & assignment
+  // Filter leads visible to the user based on RBAC & assignment (Declared before early returns to preserve hook call order)
   const visibleLeadsForUser = useMemo(() => {
     if (!currentUser) return [];
     if (currentUser.rol === "ADMIN") {
@@ -357,6 +342,21 @@ export default function Home() {
       0
     );
   }, [visibleLeadsForUser]);
+
+  // If session is checking, show smooth branded loader
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-[#030212] flex flex-col items-center justify-center gap-3 fondo-espacial">
+        <div className="w-10 h-10 border-2 border-[#375EFB] border-t-transparent rounded-full animate-spin shadow-lg shadow-[#375EFB]/30" />
+        <span className="text-xs text-[#C0C1E6] font-medium font-poppins">Iniciando Mercury CRM...</span>
+      </div>
+    );
+  }
+
+  // If no authenticated user, show login screen
+  if (!currentUser) {
+    return <LoginScreen users={users} onLogin={handleLogin} />;
+  }
 
   const mrrTotalUsd = retainers.reduce((acc, curr) => acc + curr.cuotaMensual, 0);
 
