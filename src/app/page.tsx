@@ -14,6 +14,7 @@ import { OpinionsMonitor } from "../components/OpinionsMonitor";
 import { LoginScreen } from "../components/LoginScreen";
 import { UserManagement } from "../components/UserManagement";
 import { Dashboard } from "../components/Dashboard";
+import { getAssetPath } from "../lib/basePath";
 import {
   INITIAL_LEADS,
   INITIAL_SOCIAL_FEED,
@@ -310,8 +311,18 @@ export default function Home() {
     showToast("Respuesta oficial registrada y enviada al canal del cliente.");
   };
 
-  // If session is checking or no authenticated user, show login screen
-  if (!currentUser && !isAuthChecking) {
+  // If session is checking, show smooth branded loader
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-[#030212] flex flex-col items-center justify-center gap-3 fondo-espacial">
+        <div className="w-10 h-10 border-2 border-[#375EFB] border-t-transparent rounded-full animate-spin shadow-lg shadow-[#375EFB]/30" />
+        <span className="text-xs text-[#C0C1E6] font-medium font-poppins">Iniciando Mercury CRM...</span>
+      </div>
+    );
+  }
+
+  // If no authenticated user, show login screen
+  if (!currentUser) {
     return <LoginScreen users={users} onLogin={handleLogin} />;
   }
 
@@ -631,7 +642,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div className="flex items-center gap-2.5 font-poppins">
             <div className="w-5 h-5 rounded-md overflow-hidden bg-[#030212] border border-[#6382BF]/40 p-0.5 shrink-0">
-              <img src="/brand/mercury-icon.png" alt="Mercury CAD" className="w-full h-full object-contain" />
+              <img src={getAssetPath("/brand/mercury-icon.png")} alt="Mercury CAD" className="w-full h-full object-contain" />
             </div>
             <span className="text-white font-semibold">Mercury Creation & Design</span>
             <span className="text-slate-600">•</span>

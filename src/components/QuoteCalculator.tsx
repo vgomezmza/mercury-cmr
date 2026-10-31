@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import type { Lead } from "../types/crm";
+import { getAssetPath } from "../lib/basePath";
 import {
   Calculator,
   Layers,
@@ -394,7 +395,7 @@ www.mercurycad.com.ar • info@mercurycad.com.ar
                 Resumen Ejecutivo
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#375EFB]/15 text-[#C0C1E6] border border-[#375EFB]/30 flex items-center gap-1.5 font-poppins">
-                <img src="/brand/mercury-icon.png" alt="" className="w-3.5 h-3.5 object-contain" />
+                <img src={getAssetPath("/brand/mercury-icon.png")} alt="" className="w-3.5 h-3.5 object-contain" />
                 Mercury CAD
               </span>
             </div>

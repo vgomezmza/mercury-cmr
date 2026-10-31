@@ -16,13 +16,15 @@ const roboto = Roboto({
   display: "swap",
 });
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export const metadata: Metadata = {
   title: "Mercury Creation and Design | CRM Omnicanal",
   description: "Agencia digital en Mendoza especializada en UX/UI, branding, desarrollo web y software a medida.",
   icons: {
-    icon: "/brand/mercury-icon.png",
-    shortcut: "/brand/mercury-icon.png",
-    apple: "/brand/mercury-icon.png",
+    icon: `${basePath}/brand/mercury-icon.png`,
+    shortcut: `${basePath}/brand/mercury-icon.png`,
+    apple: `${basePath}/brand/mercury-icon.png`,
   },
 };
 

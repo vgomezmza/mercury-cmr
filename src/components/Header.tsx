@@ -18,6 +18,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { User } from "../types/crm";
+import { getAssetPath } from "../lib/basePath";
 
 interface HeaderProps {
   onOpenNewLead: () => void;
@@ -65,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative group">
             <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#030212] border border-[#6382BF]/40 shadow-lg shadow-[#375EFB]/20 flex items-center justify-center p-1 group-hover:border-[#375EFB] group-hover:shadow-[#375EFB]/40 transition-all">
               <img
-                src="/brand/mercury-icon.png"
+                src={getAssetPath("/brand/mercury-icon.png")}
                 alt="Mercury Creation & Design"
                 className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(55,94,251,0.5)]"
               />

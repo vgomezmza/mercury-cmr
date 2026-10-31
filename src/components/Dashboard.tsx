@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import type { Lead, User } from "../types/crm";
 import { SERVICE_LABELS } from "./PipelineKanban";
+import { getAssetPath } from "../lib/basePath";
 import {
   Users,
   Sparkles,
@@ -129,7 +130,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Subtle Mercury CAD constellation watermark */}
         <div className="absolute right-2 -bottom-4 w-72 h-36 opacity-10 pointer-events-none select-none flex items-center justify-end">
           <img
-            src="/brand/mercury-logo-white.png"
+            src={getAssetPath("/brand/mercury-logo-white.png")}
             alt=""
             className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(55,94,251,0.6)]"
           />

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { User } from "../types/crm";
+import { getAssetPath } from "../lib/basePath";
 import {
   ShieldCheck,
   Lock,
@@ -121,14 +122,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
             <div className="relative group mb-3">
               <div className="w-20 h-20 rounded-2xl bg-[#030212]/90 border border-[#6382BF]/40 shadow-2xl shadow-[#375EFB]/30 flex items-center justify-center p-2.5 backdrop-blur-md group-hover:border-[#375EFB] group-hover:shadow-[#375EFB]/50 transition-all duration-300">
                 <img
-                  src="/brand/mercury-icon.png"
+                  src={getAssetPath("/brand/mercury-icon.png")}
                   alt="Mercury CAD Constellation"
                   className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(55,94,251,0.6)]"
                 />
               </div>
             </div>
             <img
-              src="/brand/mercury-logo-white.png"
+              src={getAssetPath("/brand/mercury-logo-white.png")}
               alt="Mercury Creation & Design"
               className="h-10 w-auto object-contain filter drop-shadow-[0_2px_12px_rgba(55,94,251,0.4)]"
             />
