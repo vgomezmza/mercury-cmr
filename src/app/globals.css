@@ -25,10 +25,10 @@
 }
 
 :root {
-  --background: #030212;
+  --background: #040B2A;
   --foreground: #FFFFFF;
-  --card-bg: rgba(10, 18, 64, 0.72);
-  --card-border: rgba(99, 130, 191, 0.22);
+  --card-bg: #06113D;
+  --card-border: #2F4FE0;
   --accent-blue: #375EFB;
   --accent-indigo: #2e3194;
   --accent-slate: #6382BF;
@@ -49,16 +49,34 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(3, 2, 18, 0.85);
+  background: rgba(4, 11, 42, 0.9);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 130, 191, 0.4);
-  border-radius: 4px;
+  background: rgba(99, 130, 191, 0.45);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(55, 94, 251, 0.7);
+  background: rgba(55, 94, 251, 0.8);
+}
+
+/* Light pill vertical scrollbar for priority clients list (PDF Redesign) */
+.mercury-light-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mercury-light-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mercury-light-scroll::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 9999px;
+}
+
+.mercury-light-scroll::-webkit-scrollbar-thumb:hover {
+  background: #FFFFFF;
 }
 
 /* Authentic Starfield from mercurycad.com.ar (#fondo-espacial) */
@@ -116,13 +134,9 @@ body {
   }
 }
 
-/* Cosmic gradient atmosphere inspired by Mercury CAD */
+/* Deep navy atmosphere matching Mercury CRM redesign */
 .cosmic-bg {
-  background: 
-    radial-gradient(circle at 18% 18%, rgba(55, 94, 251, 0.16) 0%, transparent 45%),
-    radial-gradient(circle at 82% 82%, rgba(46, 49, 148, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 50% 40%, rgba(10, 18, 64, 0.45) 0%, transparent 65%),
-    #030212;
+  background-color: #040B2A;
 }
 
 /* Glassmorphic utilities styled with Mercury CAD tokens */

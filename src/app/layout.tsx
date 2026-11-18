@@ -35,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es-AR" className={`${poppins.variable} ${roboto.variable} dark h-full`}>
-      <body className="min-h-screen bg-[#030212] text-slate-100 font-sans antialiased selection:bg-[#375EFB] selection:text-white relative fondo-espacial">
+      <body className="min-h-screen bg-[#040B2A] text-slate-100 font-sans antialiased selection:bg-[#375EFB] selection:text-white relative">
         {children}
       </body>
     </html>

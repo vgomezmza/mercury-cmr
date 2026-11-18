@@ -81,10 +81,10 @@ describe("Verificación exhaustiva de montaje y apertura de todas las vistas del
       );
     });
 
-    expect(container.innerHTML).toContain("Mercury Creation &amp; Design");
-    expect(container.innerHTML).toContain(adminUser.nombre);
-    expect(container.innerHTML).toContain("Nuevo Lead");
-    expect(container.innerHTML).toContain("Gestión de Usuarios");
+    expect(container.innerHTML).toContain("MERCURY");
+    expect(container.innerHTML).toContain("Buscar por cliente, empresa...");
+    expect(container.innerHTML).toContain("Víctor");
+    expect(container.innerHTML).toContain("Cerrar Sesión");
   });
 
   it("3. Vista: Dashboard (Inicio / Tablero de Control)", async () => {
@@ -105,8 +105,11 @@ describe("Verificación exhaustiva de montaje y apertura de todas las vistas del
     });
 
     expect(container.innerHTML).toContain("¡Hola, Víctor!");
+    expect(container.innerHTML).toContain("Total Prospectos");
+    expect(container.innerHTML).toContain("Leads En Calificación");
+    expect(container.innerHTML).toContain("En Negociación");
     expect(container.innerHTML).toContain("Pipeline Estimado");
-    expect(container.innerHTML).toContain("Clientes que requieren tu atención hoy");
+    expect(container.innerHTML).toContain("Clientes Que Requieren Tu Atención Hoy");
   });
 
   it("4. Vista: ProspectsDirectory (Directorio de Prospectos)", async () => {
@@ -257,8 +260,14 @@ describe("Verificación exhaustiva de montaje y apertura de todas las vistas del
       );
     });
 
-    expect(container.innerHTML).toContain("Paso 1: Identificación del Prospecto");
-    expect(container.innerHTML).toContain("Empresa / Organización");
+    expect(container.innerHTML).toContain("Crear Nuevo Lead");
+    expect(container.innerHTML).toContain("Nombre y Apellido");
+    expect(container.innerHTML).toContain("Empresa");
+    expect(container.innerHTML).toContain("Email");
+    expect(container.innerHTML).toContain("Teléfono");
+    expect(container.innerHTML).toContain("Notas");
+    expect(container.innerHTML).toContain("Agregar Lead");
+    expect(container.innerHTML).toContain("Crear y agregar otro");
   });
 
   it("13. Modal: LeadDetailModal (Expediente, Guía de Cierre y WhatsApp)", async () => {

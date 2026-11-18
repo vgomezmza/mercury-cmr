@@ -52,6 +52,7 @@ import {
   Mail,
   Users as UsersIcon,
   LayoutDashboard,
+  Plus,
 } from "lucide-react";
 
 export default function Home() {
@@ -242,11 +243,14 @@ export default function Home() {
     showToast(`Prospecto ${updatedLead.empresa} actualizado.`);
   };
 
-  const handleSaveNewLead = (newLead: Lead) => {
+  const handleSaveNewLead = (newLead: Lead, options?: { keepOpen?: boolean }) => {
     updateAndPersistLeads((prev) => [newLead, ...prev]);
-    setSelectedLead(newLead);
-    setSelectedLeadTab("guide");
-    showToast(`¡Cliente potencial registrado! Iniciando guía paso a paso al cierre.`);
+    if (options?.keepOpen) {
+      showToast(`Lead "${newLead.empresa}" creado. Puedes cargar el siguiente.`);
+    } else {
+      setIsNewLeadOpen(false);
+      showToast(`¡Lead "${newLead.empresa}" agregado exitosamente!`);
+    }
   };
 
   const handleCreateProjectFromLead = (lead: Lead) => {
@@ -502,10 +506,17 @@ export default function Home() {
         </div>
       )}
 
-      {/* Main Header with User Profile Badge & Logout */}
+      {/* Main Header (PDF Redesign) */}
       <Header
         onOpenNewLead={() => setIsNewLeadOpen(true)}
-        onOpenUsers={() => setActiveTab("users")}
+        onOpenUsers={() => {
+          setIsNewLeadOpen(false);
+          setActiveTab("users");
+        }}
+        onGoHome={() => {
+          setIsNewLeadOpen(false);
+          setActiveTab("dashboard");
+        }}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         leadsCount={leads.length}
@@ -515,205 +526,212 @@ export default function Home() {
         onLogout={handleLogout}
       />
 
-      {/* Navigation Sub-Bar */}
-      <nav className="glass-panel border-b border-slate-800/80 px-6 py-2.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none py-1">
-            {visibleTabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap font-poppins ${
-                    isActive
-                      ? "bg-[#375EFB] text-white shadow-lg shadow-[#375EFB]/35 ring-1 ring-white/30"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-[#0A1240]/60"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
-                  {tab.badge !== undefined && tab.badge > 0 && (
-                    <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                        isActive
-                          ? "bg-white text-[#2e3194]"
-                          : "bg-[#0A1240] text-[#C0C1E6] border border-[#6382BF]/30"
-                      }`}
-                    >
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      {/* Minimalist Navigation Sub-Bar (Hidden in full-focus Crear Nuevo Lead view) */}
+      {!isNewLeadOpen && (
+        <nav className="bg-[#040B2A] border-b border-[#1E338A]/60 px-4 sm:px-6 py-2">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+              {visibleTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as TabType)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                      isActive
+                        ? "bg-[#2E5BFF] text-white shadow-sm"
+                        : "text-[#94A3B8] hover:text-white hover:bg-[#0B174A]"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                    {tab.badge !== undefined && tab.badge > 0 && (
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
+                          isActive
+                            ? "bg-white/20 text-white"
+                            : "bg-[#0B174A] text-[#CBD5E1] border border-[#2F4FE0]/40"
+                        }`}
+                      >
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400 pl-4">
-            <span className="flex items-center gap-1.5 whitespace-nowrap">
-              <Mail className="w-3.5 h-3.5 text-blue-400" />
-              <strong className="text-slate-300 font-semibold">{emailConfig.email}</strong>
-            </span>
+            <button
+              type="button"
+              onClick={() => setIsNewLeadOpen(true)}
+              className="px-3.5 py-1.5 rounded-lg bg-[#229622] hover:bg-[#29AE29] text-white text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Nuevo Lead</span>
+            </button>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
-        {activeTab === "dashboard" && currentUser && (
-          <Dashboard
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-6 flex flex-col">
+        {isNewLeadOpen ? (
+          <NewLeadModal
+            isOpen={isNewLeadOpen}
+            onClose={() => setIsNewLeadOpen(false)}
+            onSaveLead={handleSaveNewLead}
+            existingLeads={leads}
             currentUser={currentUser}
             users={users}
-            leads={leads}
-            onOpenNewLead={() => setIsNewLeadOpen(true)}
-            onSelectLead={(lead) => {
-              setSelectedLead(lead);
-              setSelectedLeadTab("guide");
-            }}
-            onNavigateTab={(tabId) => setActiveTab(tabId as TabType)}
-            onAssignLead={handleAssignLead}
-            adminFilterUserId={adminFilterUserId}
-            setAdminFilterUserId={setAdminFilterUserId}
+            variant="page"
           />
-        )}
+        ) : (
+          <>
+            {activeTab === "dashboard" && currentUser && (
+              <Dashboard
+                currentUser={currentUser}
+                users={users}
+                leads={leads}
+                onOpenNewLead={() => setIsNewLeadOpen(true)}
+                onSelectLead={(lead) => {
+                  setSelectedLead(lead);
+                  setSelectedLeadTab("guide");
+                }}
+                onNavigateTab={(tabId) => setActiveTab(tabId as TabType)}
+                onAssignLead={handleAssignLead}
+                adminFilterUserId={adminFilterUserId}
+                setAdminFilterUserId={setAdminFilterUserId}
+                searchQuery={searchQuery}
+              />
+            )}
 
-        {activeTab === "prospects" && (
-          <ProspectsDirectory
-            leads={searchedLeads}
-            onSelectLead={(lead) => {
-              setSelectedLead(lead);
-              setSelectedLeadTab("guide");
-            }}
-            onUpdateStatus={handleUpdateLeadStatus}
-            onGoToQuote={(lead) => {
-              setActiveQuoteLead(lead);
-              setSelectedLead(null);
-              setActiveTab("quotes");
-              showToast(`Cotizador CPQ cargado para ${lead.empresa}`);
-            }}
-            onOpenNewLead={() => setIsNewLeadOpen(true)}
-            currentUser={currentUser}
-            users={users}
-            onAssignLead={handleAssignLead}
-          />
-        )}
+            {activeTab === "prospects" && (
+              <ProspectsDirectory
+                leads={searchedLeads}
+                onSelectLead={(lead) => {
+                  setSelectedLead(lead);
+                  setSelectedLeadTab("guide");
+                }}
+                onUpdateStatus={handleUpdateLeadStatus}
+                onGoToQuote={(lead) => {
+                  setActiveQuoteLead(lead);
+                  setSelectedLead(null);
+                  setActiveTab("quotes");
+                  showToast(`Cotizador CPQ cargado para ${lead.empresa}`);
+                }}
+                onOpenNewLead={() => setIsNewLeadOpen(true)}
+                currentUser={currentUser}
+                users={users}
+                onAssignLead={handleAssignLead}
+              />
+            )}
 
-        {activeTab === "pipeline" && (
-          <PipelineKanban
-            leads={searchedLeads}
-            onUpdateLeadStatus={handleUpdateLeadStatus}
-            onSelectLead={(lead) => {
-              setSelectedLead(lead);
-              setSelectedLeadTab("guide");
-            }}
-            filterService={filterService}
-            setFilterService={setFilterService}
-          />
-        )}
+            {activeTab === "pipeline" && (
+              <PipelineKanban
+                leads={searchedLeads}
+                onUpdateLeadStatus={handleUpdateLeadStatus}
+                onSelectLead={(lead) => {
+                  setSelectedLead(lead);
+                  setSelectedLeadTab("guide");
+                }}
+                filterService={filterService}
+                setFilterService={setFilterService}
+              />
+            )}
 
-        {activeTab === "opinions" && (
-          <OpinionsMonitor
-            opinions={opinions}
-            onReplyOpinion={handleReplyOpinion}
-            onSelectLeadById={(leadId) => {
-              const found = leads.find((l) => l.id === leadId);
-              if (found) {
-                setSelectedLead(found);
-                setSelectedLeadTab("guide");
-              }
-            }}
-          />
-        )}
+            {activeTab === "opinions" && (
+              <OpinionsMonitor
+                opinions={opinions}
+                onReplyOpinion={handleReplyOpinion}
+                onSelectLeadById={(leadId) => {
+                  const found = leads.find((l) => l.id === leadId);
+                  if (found) {
+                    setSelectedLead(found);
+                    setSelectedLeadTab("guide");
+                  }
+                }}
+              />
+            )}
 
-        {activeTab === "social" && (
-          <SocialHub
-            socialFeed={socialFeed}
-            onConvertToLead={handleConvertToLead}
-            onSendReply={handleSendReply}
-          />
-        )}
+            {activeTab === "social" && (
+              <SocialHub
+                socialFeed={socialFeed}
+                onConvertToLead={handleConvertToLead}
+                onSendReply={handleSendReply}
+              />
+            )}
 
-        {activeTab === "quotes" && <QuoteCalculator initialLead={activeQuoteLead} />}
+            {activeTab === "quotes" && <QuoteCalculator initialLead={activeQuoteLead} />}
 
-        {activeTab === "retainers" && (
-          <RetainersProjects retainers={retainers} projects={projects} />
-        )}
+            {activeTab === "retainers" && (
+              <RetainersProjects retainers={retainers} projects={projects} />
+            )}
 
-        {activeTab === "settings" && (
-          <ChannelSettings
-            emailConfig={emailConfig}
-            socialConfig={socialConfig}
-            onSaveEmailConfig={handleSaveEmailConfig}
-            onSaveSocialConfig={handleSaveSocialConfig}
-          />
-        )}
+            {activeTab === "settings" && (
+              <ChannelSettings
+                emailConfig={emailConfig}
+                socialConfig={socialConfig}
+                onSaveEmailConfig={handleSaveEmailConfig}
+                onSaveSocialConfig={handleSaveSocialConfig}
+              />
+            )}
 
-        {activeTab === "users" && currentUser && (
-          <div className="space-y-4">
-            {currentUser.rol !== "ADMIN" && (
-              <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/30 flex items-center gap-3 text-xs shadow-lg">
-                <span className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-300 flex items-center justify-center font-bold text-sm shrink-0">
-                  🛡️
-                </span>
-                <div>
-                  <strong className="text-white block text-xs">Acceso en Modo Lectura ({currentUser.nombre} - {currentUser.rol})</strong>
-                  <span className="text-slate-300 text-[11px]">
-                    Para registrar nuevos usuarios, editar permisos RBAC o cambiar contraseñas, debes iniciar sesión con una cuenta Administrador.
-                  </span>
-                </div>
+            {activeTab === "users" && currentUser && (
+              <div className="space-y-4">
+                {currentUser.rol !== "ADMIN" && (
+                  <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/30 flex items-center gap-3 text-xs shadow-lg">
+                    <span className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-300 flex items-center justify-center font-bold text-sm shrink-0">
+                      🛡️
+                    </span>
+                    <div>
+                      <strong className="text-white block text-xs">Acceso en Modo Lectura ({currentUser.nombre} - {currentUser.rol})</strong>
+                      <span className="text-slate-300 text-[11px]">
+                        Para registrar nuevos usuarios, editar permisos RBAC o cambiar contraseñas, debes iniciar sesión con una cuenta Administrador.
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <UserManagement
+                  users={users}
+                  onAddUser={handleAddUser}
+                  onUpdateUser={handleUpdateUser}
+                  onDeleteUser={handleDeleteUser}
+                  currentUser={currentUser}
+                  leads={leads}
+                  onAssignLead={handleAssignLead}
+                />
               </div>
             )}
-            <UserManagement
-              users={users}
-              onAddUser={handleAddUser}
-              onUpdateUser={handleUpdateUser}
-              onDeleteUser={handleDeleteUser}
-              currentUser={currentUser}
-              leads={leads}
-              onAssignLead={handleAssignLead}
-            />
-          </div>
+          </>
         )}
       </main>
 
-      {/* Mercury CAD Branded Footer */}
-      <footer className="glass-panel border-t border-slate-800/80 px-6 py-4 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-          <div className="flex items-center gap-2.5 font-poppins">
-            <div className="w-5 h-5 rounded-md overflow-hidden bg-[#030212] border border-[#6382BF]/40 p-0.5 shrink-0">
-              <img src={getAssetPath("/brand/mercury-icon.png")} alt="Mercury CAD" className="w-full h-full object-contain" />
-            </div>
-            <span className="text-white font-semibold">Mercury Creation & Design</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">Mendoza, Argentina</span>
+      {/* Minimalist Mercury CAD Footer (PDF Redesign) */}
+      <footer className="bg-[#040B2A] border-t border-[#2F4FE0] px-4 sm:px-6 py-4 mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#CBD5E1]">
+          <div className="flex items-center gap-2">
+            <span>Mercury Creation &amp; Design</span>
+            <span className="text-[#94A3B8]">•</span>
+            <span>Mendoza, Argentina</span>
           </div>
-          <div className="flex items-center gap-3 text-[11px] text-[#C0C1E6]">
+          <div className="flex items-center gap-2">
             <span>info@mercurycad.com.ar</span>
-            <span className="text-slate-600">•</span>
+            <span className="text-[#94A3B8]">•</span>
             <a
               href="https://mercurycad.com.ar"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#375EFB] hover:text-[#C0C1E6] font-semibold transition-colors flex items-center gap-1"
+              className="text-white hover:text-[#93C5FD] underline underline-offset-2 transition-colors inline-flex items-center gap-0.5"
             >
-              mercurycad.com.ar
-              <span className="text-[10px]">↗</span>
+              <span>mercurycad.com.ar</span>
+              <span className="text-[11px] no-underline">↗</span>
             </a>
           </div>
         </div>
       </footer>
 
-      {/* Modals */}
-      <NewLeadModal
-        isOpen={isNewLeadOpen}
-        onClose={() => setIsNewLeadOpen(false)}
-        onSaveLead={handleSaveNewLead}
-        existingLeads={leads}
-        currentUser={currentUser}
-        users={users}
-      />
-
+      {/* Lead Detail Modal */}
       <LeadDetailModal
         lead={selectedLead}
         onClose={() => setSelectedLead(null)}

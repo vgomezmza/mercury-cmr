@@ -1,31 +1,8 @@
 "use client";
 
-import React, { useMemo } from "react";
-import type { Lead, User } from "../types/crm";
-import { SERVICE_LABELS } from "./PipelineKanban";
-import { getAssetPath } from "../lib/basePath";
-import {
-  Users,
-  Sparkles,
-  TrendingUp,
-  DollarSign,
-  Plus,
-  ArrowRight,
-  Clock,
-  Phone,
-  Mail,
-  Building,
-  Shield,
-  Briefcase,
-  CheckCircle2,
-  AlertCircle,
-  ChevronRight,
-  Kanban,
-  FileText,
-  UserCheck,
-  UserPlus,
-  Target,
-} from "lucide-react";
+import React, { useMemo, useState } from "react";
+import type { Lead, LeadStatus, User } from "../types/crm";
+import { ArrowRight, ChevronDown, Plus, Search, X } from "lucide-react";
 
 interface DashboardProps {
   currentUser: User;
@@ -37,6 +14,53 @@ interface DashboardProps {
   onAssignLead?: (leadId: string, assignedUserId: string, assignedUserName: string) => void;
   adminFilterUserId?: string;
   setAdminFilterUserId?: (userId: string) => void;
+  searchQuery?: string;
+}
+
+const STATUS_BADGE_CONFIG: Record<LeadStatus, { label: string; className: string }> = {
+  EN_NEGOCIACION: {
+    label: "En Negociación",
+    className: "bg-[#7C3A21] text-[#FCE7D9] border-[#B4532A]",
+  },
+  PROPUESTA_ENVIADA: {
+    label: "Propuesta Enviada",
+    className: "bg-[#1D3A8A] text-[#DBEAFE] border-[#3B62F6]",
+  },
+  NUEVO: {
+    label: "Nuevo",
+    className: "bg-[#14532D] text-[#DCFCE7] border-[#228B4E]",
+  },
+  RELEVAMIENTO: {
+    label: "Relevamiento",
+    className: "bg-[#164E63] text-[#CFFAFE] border-[#0891B2]",
+  },
+  GANADO: {
+    label: "Ganado",
+    className: "bg-[#065F46] text-[#D1FAE5] border-[#10B981]",
+  },
+  PERDIDO: {
+    label: "Perdido",
+    className: "bg-[#451A1A] text-[#FECACA] border-[#991B1B]",
+  },
+};
+
+function formatCompactUsd(amount: number): string {
+  if (amount >= 1_000_000) {
+    const millions = amount / 1_000_000;
+    const formatted = Number.isInteger(millions)
+      ? millions.toString()
+      : millions.toFixed(1).replace(/\.0$/, "");
+    return `$${formatted}M USD`;
+  }
+  if (amount >= 1_000) {
+    const thousands = amount / 1_000;
+    const formatted =
+      thousands >= 100 || Number.isInteger(thousands)
+        ? Math.round(thousands).toString()
+        : thousands.toFixed(1).replace(/\.0$/, "");
+    return `$${formatted}K USD`;
+  }
+  return `$${amount.toLocaleString("es-AR")} USD`;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -46,22 +70,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onOpenNewLead,
   onSelectLead,
   onNavigateTab,
-  onAssignLead,
   adminFilterUserId = "ALL",
   setAdminFilterUserId,
+  searchQuery = "",
 }) => {
   const isAdmin = currentUser.rol === "ADMIN";
+  const [isListSearchOpen, setIsListSearchOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState("");
 
-  // Filter leads according to view
+  // Filter leads according to role and admin portfolio selector
   const userLeads = useMemo(() => {
     if (!isAdmin) {
-      // Commercial / PM only sees assigned to them or created by them
       return leads.filter(
         (l) => l.asignadoAId === currentUser.id || l.creadoPorId === currentUser.id
       );
     }
 
-    // Admin view
     if (adminFilterUserId === "ALL") {
       return leads;
     }
@@ -74,523 +98,315 @@ export const Dashboard: React.FC<DashboardProps> = ({
   // KPIs
   const totalClients = userLeads.length;
 
-  // Potential leads: NUEVO or RELEVAMIENTO
   const potentialLeads = useMemo(() => {
     return userLeads.filter(
       (l) => l.estado === "NUEVO" || l.estado === "RELEVAMIENTO"
     );
   }, [userLeads]);
 
-  // In Negotiation leads: PROPUESTA_ENVIADA or EN_NEGOCIACION
   const negotiationLeads = useMemo(() => {
     return userLeads.filter(
       (l) => l.estado === "PROPUESTA_ENVIADA" || l.estado === "EN_NEGOCIACION"
     );
   }, [userLeads]);
 
-  // Total Pipeline Value
   const totalPipelineUsd = useMemo(() => {
     return userLeads.reduce((acc, curr) => acc + (curr.valorEstimado || 0), 0);
   }, [userLeads]);
 
-  // Own vs Assigned breakdown (for non-admins)
-  const ownCreatedCount = useMemo(() => {
-    return userLeads.filter((l) => l.creadoPorId === currentUser.id).length;
-  }, [userLeads, currentUser.id]);
-
-  const assignedByAdminCount = useMemo(() => {
-    return userLeads.filter(
-      (l) => l.asignadoAId === currentUser.id && l.creadoPorId !== currentUser.id
-    ).length;
-  }, [userLeads, currentUser.id]);
-
-  // Priority Clients (Actionable, top 5-6 requiring focus)
+  // Priority Clients sorted by urgency and filtered by active search
   const priorityClients = useMemo(() => {
-    return [...userLeads]
+    const combinedQuery = (localSearch || searchQuery).trim().toLowerCase();
+
+    const filtered = combinedQuery
+      ? userLeads.filter(
+          (l) =>
+            l.empresa.toLowerCase().includes(combinedQuery) ||
+            l.nombre.toLowerCase().includes(combinedQuery) ||
+            (l.asignadoANombre || "").toLowerCase().includes(combinedQuery) ||
+            l.estado.toLowerCase().replace("_", " ").includes(combinedQuery)
+        )
+      : userLeads;
+
+    return [...filtered]
       .sort((a, b) => {
-        // Prioritize in negotiation, then new with high priority
         const weight = (l: Lead) => {
           let score = 0;
           if (l.estado === "EN_NEGOCIACION") score += 50;
           if (l.estado === "PROPUESTA_ENVIADA") score += 40;
           if (l.estado === "NUEVO") score += 30;
-          if (l.prioridad === "Alta") score += 20;
-          if (l.tiempoSinContactoHoras && l.tiempoSinContactoHoras > 24) score += 15;
+          if (l.estado === "RELEVAMIENTO") score += 20;
+          if (l.prioridad === "Alta") score += 15;
+          if (l.tiempoSinContactoHoras && l.tiempoSinContactoHoras > 24) score += 10;
           return score;
         };
         return weight(b) - weight(a);
       })
-      .slice(0, 5);
-  }, [userLeads]);
+      .slice(0, 25);
+  }, [userLeads, localSearch, searchQuery]);
+
+  const firstName = currentUser.nombre.split(" ")[0];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Welcome Banner */}
-      <div className="glass-panel border border-[#6382BF]/25 rounded-3xl p-6 relative overflow-hidden bg-gradient-to-r from-[#030212]/95 via-[#0A1240]/80 to-[#0D1B3E]/60 shadow-xl">
-        {/* Subtle Mercury CAD constellation watermark */}
-        <div className="absolute right-2 -bottom-4 w-72 h-36 opacity-10 pointer-events-none select-none flex items-center justify-end">
-          <img
-            src={getAssetPath("/brand/mercury-logo-white.png")}
-            alt=""
-            className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(55,94,251,0.6)]"
-          />
+      {/* Welcome Banner (PDF Page 1) */}
+      <div className="rounded-2xl bg-[#06113D] border border-[#2F4FE0] px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight font-poppins">
+            ¡Hola, {firstName}!
+          </h2>
+          <p className="text-xs sm:text-sm text-[#CBD5E1] mt-1">
+            {isAdmin
+              ? "Vista global y supervisión comercial"
+              : "Gestión personal de tu cartera comercial"}
+          </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider bg-[#375EFB]/15 text-[#C0C1E6] border border-[#375EFB]/30 font-poppins">
-                {isAdmin ? "Panel de Dirección" : "Tablero Personal de Gestión"}
-              </span>
-              <span className="text-xs text-slate-500">•</span>
-              <span className="text-xs text-slate-400">
-                {new Date().toLocaleDateString("es-AR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}
-              </span>
+        {/* Portfolio Selector */}
+        {isAdmin && setAdminFilterUserId ? (
+          <div className="relative inline-flex items-center gap-1.5 text-sm text-white self-start sm:self-auto">
+            <span className="text-[#CBD5E1] font-normal">Cartera:</span>
+            <div className="relative inline-flex items-center">
+              <select
+                aria-label="Seleccionar cartera"
+                value={adminFilterUserId}
+                onChange={(e) => setAdminFilterUserId(e.target.value)}
+                className="appearance-none bg-transparent text-white font-medium pr-6 py-1 outline-none cursor-pointer text-sm"
+              >
+                <option value="ALL" className="bg-[#06113D] text-white">
+                  Toda la Agencia ({leads.length})
+                </option>
+                {users
+                  .filter((u) => u.rol !== "ADMIN")
+                  .map((u) => {
+                    const count = leads.filter((l) => l.asignadoAId === u.id).length;
+                    return (
+                      <option key={u.id} value={u.id} className="bg-[#06113D] text-white">
+                        {u.nombre} ({count})
+                      </option>
+                    );
+                  })}
+                <option value="UNASSIGNED" className="bg-[#06113D] text-amber-300">
+                  Sin Asignar ({leads.filter((l) => !l.asignadoAId).length})
+                </option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-white pointer-events-none absolute right-0" />
             </div>
+          </div>
+        ) : (
+          <div className="text-sm text-[#CBD5E1] self-start sm:self-auto">
+            Cartera: <span className="text-white font-medium">Mis Clientes ({totalClients})</span>
+          </div>
+        )}
+      </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-poppins">
-              ¡Hola, {currentUser.nombre.split(" ")[0]}!
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
-              {isAdmin
-                ? "Vista global y supervisión de la cartera comercial de toda la agencia Mercury CAD."
-                : `Aquí tienes la gestión de tus clientes. Administra tus cuentas propias y las asignadas por Dirección.`}
-            </p>
-
-            {/* Non-admin portfolio origin pills */}
-            {!isAdmin && (
-              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-800/60">
-                <span className="text-xs text-slate-400 font-medium">Origen de tu cartera:</span>
-                <span className="text-xs px-2.5 py-1 rounded-xl bg-[#0A1240]/80 text-[#C0C1E6] border border-[#6382BF]/30">
-                  <strong className="text-[#375EFB] font-bold">{ownCreatedCount}</strong> cargados por ti
-                </span>
-                <span className="text-xs px-2.5 py-1 rounded-xl bg-purple-950/40 text-purple-300 border border-purple-500/30">
-                  <strong className="text-purple-300 font-bold">{assignedByAdminCount}</strong> cedidos por Dirección
-                </span>
-              </div>
+      {/* 4 Semantic-Border KPI Cards (PDF Page 1) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Card 1: Total Prospectos */}
+        <button
+          type="button"
+          onClick={() => onNavigateTab("prospects")}
+          className="text-left rounded-2xl bg-[#06113D] hover:bg-[#0A1954] border border-[#355CFF] p-6 transition-all cursor-pointer flex flex-col justify-between min-h-[168px] group"
+        >
+          <div className="text-sm sm:text-base font-semibold text-white leading-snug">
+            {isAdmin ? (
+              <>
+                Total Prospectos
+                <span className="block">(O Cartera Total)</span>
+              </>
+            ) : (
+              <>
+                Mis Clientes
+                <span className="block">(Cartera Total)</span>
+              </>
             )}
           </div>
+          <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight my-3">
+            {totalClients.toLocaleString("es-AR")}
+          </div>
+          <p className="text-xs sm:text-sm text-[#CBD5E1] group-hover:text-white transition-colors">
+            Contactos En Base De Datos
+          </p>
+        </button>
 
-          {/* Right Action Controls */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            {/* Admin Filter Dropdown */}
-            {isAdmin && setAdminFilterUserId && (
-              <div className="flex items-center gap-2 bg-[#0A1240]/90 border border-[#6382BF]/30 rounded-2xl px-3 py-2 text-xs">
-                <Shield className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                <span className="text-slate-400 font-medium">Ver Cartera:</span>
-                <select
-                  value={adminFilterUserId}
-                  onChange={(e) => setAdminFilterUserId(e.target.value)}
-                  className="bg-transparent text-white font-bold outline-none cursor-pointer text-xs"
-                >
-                  <option value="ALL" className="bg-[#030212] text-white">
-                    Toda la Agencia ({leads.length})
-                  </option>
-                  {users
-                    .filter((u) => u.rol !== "ADMIN")
-                    .map((u) => {
-                      const count = leads.filter((l) => l.asignadoAId === u.id).length;
-                      return (
-                        <option key={u.id} value={u.id} className="bg-[#030212] text-white">
-                          {u.nombre} ({count})
-                        </option>
-                      );
-                    })}
-                  <option value="UNASSIGNED" className="bg-[#030212] text-amber-300">
-                    Sin Asignar ({leads.filter((l) => !l.asignadoAId).length})
-                  </option>
-                </select>
+        {/* Card 2: Leads En Calificación */}
+        <button
+          type="button"
+          onClick={() => onNavigateTab("pipeline")}
+          className="text-left rounded-2xl bg-[#06113D] hover:bg-[#0A1954] border border-[#38B86B] p-6 transition-all cursor-pointer flex flex-col justify-between min-h-[168px] group"
+        >
+          <div className="text-sm sm:text-base font-semibold text-white leading-snug">
+            Leads En Calificación
+          </div>
+          <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight my-3">
+            {potentialLeads.length.toLocaleString("es-AR")}
+          </div>
+          <p className="text-xs sm:text-sm text-[#CBD5E1] group-hover:text-white transition-colors">
+            Nuevos En Relevamiento
+          </p>
+        </button>
+
+        {/* Card 3: En Negociación */}
+        <button
+          type="button"
+          onClick={() => onNavigateTab("pipeline")}
+          className="text-left rounded-2xl bg-[#06113D] hover:bg-[#0A1954] border border-[#C9A23F] p-6 transition-all cursor-pointer flex flex-col justify-between min-h-[168px] group"
+        >
+          <div className="text-sm sm:text-base font-semibold text-white leading-snug">
+            En Negociación
+          </div>
+          <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight my-3">
+            {negotiationLeads.length.toLocaleString("es-AR")}
+          </div>
+          <p className="text-xs sm:text-sm text-[#CBD5E1] group-hover:text-white transition-colors">
+            Propuestas Presentadas
+          </p>
+        </button>
+
+        {/* Card 4: Pipeline Estimado */}
+        <button
+          type="button"
+          onClick={() => onNavigateTab("pipeline")}
+          title={`Valor exacto en pipeline: $${totalPipelineUsd.toLocaleString("es-AR")} USD`}
+          className="text-left rounded-2xl bg-[#06113D] hover:bg-[#0A1954] border border-[#3DB59E] p-6 transition-all cursor-pointer flex flex-col justify-between min-h-[168px] group"
+        >
+          <div className="text-sm sm:text-base font-semibold text-white leading-snug">
+            Pipeline Estimado
+          </div>
+          <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight my-3">
+            {formatCompactUsd(totalPipelineUsd)}
+          </div>
+          <p className="text-xs sm:text-sm text-[#CBD5E1] group-hover:text-white transition-colors flex items-center gap-1.5">
+            <span>Oportunidades Abiertas</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </p>
+        </button>
+      </div>
+
+      {/* Priority Clients Section (PDF Page 1) */}
+      <section className="space-y-3">
+        {/* Light Header Bar */}
+        <div className="bg-[#E4E7EE] rounded-xl px-5 py-3 flex items-center justify-between gap-3">
+          <h3 className="text-sm sm:text-base font-bold text-[#090F29] tracking-tight">
+            Clientes Que Requieren Tu Atención Hoy
+          </h3>
+
+          <div className="flex items-center gap-2">
+            {isListSearchOpen && (
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  autoFocus
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  placeholder="Filtrar lista..."
+                  className="bg-white text-[#090F29] placeholder-slate-500 text-xs sm:text-sm rounded-lg pl-3 pr-7 py-1.5 border border-[#355CFF]/60 outline-none focus:border-[#355CFF] w-40 sm:w-56"
+                />
+                {localSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setLocalSearch("")}
+                    className="absolute right-2 text-slate-500 hover:text-slate-800 cursor-pointer"
+                    aria-label="Limpiar filtro"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
-            )}
-
-            {isAdmin && (
-              <button
-                onClick={() => onNavigateTab("users")}
-                className="px-4 py-2.5 rounded-2xl text-xs font-bold text-purple-200 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-400 shadow-lg shadow-purple-900/30 transition-all flex items-center justify-center gap-2 active:scale-95 font-poppins"
-                title="Abrir el menú lateral de gestión de usuarios"
-              >
-                <UserPlus className="w-4 h-4 text-purple-400" />
-                <span>+ Crear Usuario</span>
-              </button>
             )}
 
             <button
-              onClick={onOpenNewLead}
-              className="px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-[#375EFB] to-[#2e3194] hover:from-[#476dfb] hover:to-[#375EFB] shadow-lg shadow-[#375EFB]/35 border border-white/20 transition-all flex items-center justify-center gap-2 active:scale-95 font-poppins"
+              type="button"
+              onClick={() => {
+                if (isListSearchOpen && !localSearch) {
+                  setIsListSearchOpen(false);
+                } else {
+                  setIsListSearchOpen((prev) => !prev);
+                }
+              }}
+              aria-label="Buscar en clientes prioritarios"
+              title="Filtrar clientes prioritarios"
+              className={`w-9 h-9 rounded-full border border-[#355CFF] flex items-center justify-center transition-all shrink-0 cursor-pointer ${
+                isListSearchOpen
+                  ? "bg-[#355CFF] text-white"
+                  : "text-[#355CFF] hover:bg-[#355CFF] hover:text-white"
+              }`}
             >
-              <Plus className="w-4 h-4" />
-              <span>+ Cargar Nuevo Cliente</span>
+              <Search className="w-4 h-4" />
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Banner Destacado: Menú Lateral y Creación de Usuarios */}
-      <div className="glass-panel p-4 sm:p-5 rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-slate-900 to-indigo-950/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 shadow-lg shadow-purple-600/20">
-            <Users className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-black text-white">
-                Gestión de Usuarios &amp; Menú Lateral
-              </h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/40">
-                {users.filter((u) => u.activo).length} Colaboradores
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 mt-0.5">
-              Accede al menú lateral para crear nuevos usuarios, configurar contraseñas, permisos RBAC y ceder carteras de clientes.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            onClick={() => onNavigateTab("users")}
-            className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2 active:scale-95"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>+ Crear Nuevo Usuario</span>
-          </button>
-          <button
-            onClick={() => onNavigateTab("users")}
-            className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-all flex items-center gap-1.5"
-          >
-            <Shield className="w-4 h-4 text-purple-400" />
-            <span>Ver Menú Lateral</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 4 Clean Visual KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Total Clientes Propios / Asignados */}
-        <div
-          onClick={() => onNavigateTab("prospects")}
-          className="glass-panel border border-slate-800 hover:border-blue-500/50 p-5 rounded-3xl transition-all hover:shadow-xl hover:shadow-blue-500/5 cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            <span>{isAdmin ? "Clientes Visibles" : "Mis Clientes"}</span>
-            <span className="p-2 rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20 transition-colors">
-              <Users className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-black text-white tracking-tight">{totalClients}</div>
-          <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-            <span>{isAdmin ? "Total en cartera seleccionada" : "Cuentas activas a tu cargo"}</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
-          </p>
-        </div>
-
-        {/* Card 2: Clientes Potenciales */}
-        <div
-          onClick={() => onNavigateTab("pipeline")}
-          className="glass-panel border border-slate-800 hover:border-amber-500/50 p-5 rounded-3xl transition-all hover:shadow-xl hover:shadow-amber-500/5 cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            <span>Potenciales</span>
-            <span className="p-2 rounded-xl bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-              <Sparkles className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-black text-amber-300 tracking-tight">
-            {potentialLeads.length}
-          </div>
-          <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-            <span>Nuevos o en Relevamiento</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
-          </p>
-        </div>
-
-        {/* Card 3: En Negociación */}
-        <div
-          onClick={() => onNavigateTab("pipeline")}
-          className="glass-panel border border-slate-800 hover:border-cyan-500/50 p-5 rounded-3xl transition-all hover:shadow-xl hover:shadow-cyan-500/5 cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            <span>En Negociación</span>
-            <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
-              <TrendingUp className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-black text-cyan-300 tracking-tight">
-            {negotiationLeads.length}
-          </div>
-          <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-            <span>Propuestas presentadas</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
-          </p>
-        </div>
-
-        {/* Card 4: Valor Total en Pipeline */}
-        <div
-          onClick={() => onNavigateTab("pipeline")}
-          className="glass-panel border border-slate-800 hover:border-emerald-500/50 p-5 rounded-3xl transition-all hover:shadow-xl hover:shadow-emerald-500/5 cursor-pointer group relative overflow-hidden"
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            <span>Pipeline Estimado</span>
-            <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
-              <DollarSign className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-black text-emerald-400 tracking-tight">
-            ${totalPipelineUsd.toLocaleString("es-AR")}
-            <span className="text-xs font-bold text-slate-400 ml-1">USD</span>
-          </div>
-          <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-            <span>Oportunidades abiertas</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
-          </p>
-        </div>
-      </div>
-
-      {/* Main Focus: Clientes Prioritarios de Hoy */}
-      <div className="glass-panel border border-slate-800 rounded-3xl p-6 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-800/80">
-          <div>
-            <h3 className="font-bold text-base text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-400" />
-              <span>Clientes que requieren tu atención hoy</span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold">
-                Foco prioritario
-              </span>
-            </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Contactos clave en etapa de propuesta o que requieren seguimiento comercial inmediato.
-            </p>
-          </div>
-
-          <button
-            onClick={() => onNavigateTab("prospects")}
-            className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 self-start sm:self-auto transition-colors"
-          >
-            <span>Ver todos mis clientes ({userLeads.length})</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
+        {/* Scrollable Priority Rows */}
         {priorityClients.length === 0 ? (
-          <div className="text-center py-12 px-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-500">
-              <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-            </div>
-            <h4 className="text-sm font-bold text-slate-200">¡Todo al día!</h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-              No tienes clientes con alertas pendientes de seguimiento en este momento.
+          <div className="rounded-xl bg-[#0C184A] border border-[#2F4FE0] py-10 px-6 text-center space-y-3">
+            <p className="text-sm font-semibold text-white">
+              No hay clientes prioritarios para mostrar con este filtro.
             </p>
             <button
+              type="button"
               onClick={onOpenNewLead}
-              className="mt-4 px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 transition-all inline-flex items-center gap-1.5"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2E5BFF] hover:bg-[#436DFF] text-white text-xs sm:text-sm font-medium transition-colors cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Cargar Primer Cliente</span>
+              <Plus className="w-4 h-4" />
+              <span>Crear Nuevo Lead</span>
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="max-h-[340px] overflow-y-auto pr-2.5 space-y-3 mercury-light-scroll">
             {priorityClients.map((lead) => {
-              const service = SERVICE_LABELS[lead.servicioInteres];
-              const isAssignedToCurrent = lead.asignadoAId === currentUser.id;
-              const isCeded = isAssignedToCurrent && lead.creadoPorId && lead.creadoPorId !== currentUser.id;
+              const statusCfg = STATUS_BADGE_CONFIG[lead.estado] || {
+                label: lead.estado.replace("_", " "),
+                className: "bg-[#1D3A8A] text-[#DBEAFE] border-[#3B62F6]",
+              };
 
               return (
                 <div
                   key={lead.id}
-                  className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 hover:bg-slate-900/90 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group"
+                  onClick={() => onSelectLead(lead)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelectLead(lead);
+                    }
+                  }}
+                  className="bg-[#0C184A] hover:bg-[#122263] border border-[#2F4FE0] rounded-xl px-5 py-4 flex items-center justify-between gap-4 cursor-pointer transition-all group"
                 >
-                  <div className="flex items-start sm:items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 font-bold shrink-0">
-                      {lead.empresa ? lead.empresa.charAt(0).toUpperCase() : lead.nombre.charAt(0).toUpperCase()}
-                    </div>
+                  <div className="flex items-center flex-wrap gap-3 sm:gap-5 min-w-0">
+                    <span className="text-sm sm:text-base text-[#E2E8F0] group-hover:text-white font-normal min-w-[140px] sm:min-w-[180px] truncate transition-colors">
+                      {lead.empresa || lead.nombre}
+                    </span>
 
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h4
-                          onClick={() => onSelectLead(lead)}
-                          className="font-bold text-sm text-white group-hover:text-blue-400 cursor-pointer transition-colors"
-                        >
-                          {lead.empresa || lead.nombre}
-                        </h4>
+                    <span
+                      className={`px-3 py-1 rounded-md text-xs font-medium border whitespace-nowrap ${statusCfg.className}`}
+                    >
+                      {statusCfg.label}
+                    </span>
 
-                        {/* Status Badge */}
-                        <span
-                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
-                            lead.estado === "EN_NEGOCIACION"
-                              ? "bg-amber-950/60 text-amber-300 border-amber-500/30"
-                              : lead.estado === "PROPUESTA_ENVIADA"
-                              ? "bg-cyan-950/60 text-cyan-300 border-cyan-500/30"
-                              : lead.estado === "GANADO"
-                              ? "bg-emerald-950/60 text-emerald-300 border-emerald-500/30"
-                              : "bg-blue-950/60 text-blue-300 border-blue-500/30"
-                          }`}
-                        >
-                          {lead.estado.replace("_", " ")}
-                        </span>
-
-                        {/* Service Badge */}
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${service.tagClass}`}>
-                          {service.name}
-                        </span>
-
-                        {/* Ceded by Admin pill */}
-                        {isCeded && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-950/80 text-purple-300 border border-purple-500/40 flex items-center gap-1">
-                            <Shield className="w-2.5 h-2.5 text-purple-400" />
-                            Cedido por Admin
-                          </span>
-                        )}
-
-                        {/* Admin view: show who is assigned */}
-                        {isAdmin && lead.asignadoANombre && (
-                          <span className="text-[10px] font-medium text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-700">
-                            Resp: <strong className="text-slate-300">{lead.asignadoANombre}</strong>
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mt-1">
-                        <span className="text-slate-300 font-medium">{lead.nombre}</span>
-                        <span>•</span>
-                        <span>{lead.email}</span>
-                        {lead.telefono && (
-                          <>
-                            <span>•</span>
-                            <span className="text-slate-400">{lead.telefono}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                    <span className="px-3 py-1 rounded-md text-xs font-normal bg-[#162040] border border-[#334155] text-[#D8E0F0] whitespace-nowrap">
+                      Resp. {lead.asignadoANombre || "Sin asignar"}
+                    </span>
                   </div>
 
-                  {/* Actions & Budget */}
-                  <div className="flex items-center justify-between md:justify-end gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800/60">
-                    <div className="text-left md:text-right">
-                      <span className="text-[10px] uppercase font-semibold text-slate-500 block">
-                        Presupuesto
-                      </span>
-                      <span className="text-sm font-black text-emerald-400">
-                        ${lead.valorEstimado.toLocaleString("es-AR")} {lead.moneda}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {/* Direct WhatsApp link if phone exists */}
-                      {lead.telefono && (
-                        <a
-                          href={`https://wa.me/${lead.telefono.replace(/[^0-9]/g, "")}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-2 rounded-xl bg-slate-800 hover:bg-emerald-950/60 hover:text-emerald-300 border border-slate-700 hover:border-emerald-500/40 text-slate-300 transition-all text-xs"
-                          title="Contactar vía WhatsApp"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-
-                      {/* Guía de Cierre Button */}
-                      <button
-                        onClick={() => onSelectLead(lead)}
-                        className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600/30 to-indigo-600/30 hover:from-blue-600 hover:to-indigo-600 text-blue-200 hover:text-white border border-blue-500/40 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm"
-                        title="Abrir la Guía Paso a Paso al Cierre de la Venta"
-                      >
-                        <Target className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>Guía de Cierre</span>
-                      </button>
-
-                      {/* Admin Quick Re-assign dropdown */}
-                      {isAdmin && onAssignLead && (
-                        <select
-                          value={lead.asignadoAId || ""}
-                          onChange={(e) => {
-                            const selectedUser = users.find((u) => u.id === e.target.value);
-                            onAssignLead(
-                              lead.id,
-                              e.target.value,
-                              selectedUser ? selectedUser.nombre : "Sin Asignar"
-                            );
-                          }}
-                          className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] font-semibold rounded-xl px-2 py-1.5 outline-none hover:border-purple-500/50 cursor-pointer"
-                          title="Ceder / Reasignar cliente"
-                        >
-                          <option value="">Sin Asignar</option>
-                          {users.map((u) => (
-                            <option key={u.id} value={u.id}>
-                              Ceder a: {u.nombre}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectLead(lead);
+                    }}
+                    aria-label={`Ver detalle de ${lead.empresa || lead.nombre}`}
+                    className="w-9 h-9 rounded-full border border-[#355CFF] text-[#5B7CFF] group-hover:bg-[#355CFF] group-hover:text-white flex items-center justify-center shrink-0 transition-all cursor-pointer"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               );
             })}
           </div>
         )}
-      </div>
-
-      {/* 3 Quick Action Shortcuts (Clean & focused) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div
-          onClick={() => onNavigateTab("pipeline")}
-          className="p-4 rounded-2xl glass-panel border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all flex items-center justify-between group"
-        >
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20 transition-colors">
-              <Kanban className="w-4 h-4" />
-            </span>
-            <div>
-              <h5 className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">
-                Pipeline Kanban
-              </h5>
-              <p className="text-[11px] text-slate-400">Ver y arrastrar etapas del embudo</p>
-            </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-        </div>
-
-        <div
-          onClick={() => onNavigateTab("prospects")}
-          className="p-4 rounded-2xl glass-panel border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all flex items-center justify-between group"
-        >
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 transition-colors">
-              <Building className="w-4 h-4" />
-            </span>
-            <div>
-              <h5 className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors">
-                Directorio Completo
-              </h5>
-              <p className="text-[11px] text-slate-400">Explorar cartera con filtros avanzados</p>
-            </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-        </div>
-
-        <div
-          onClick={() => onNavigateTab("quotes")}
-          className="p-4 rounded-2xl glass-panel border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all flex items-center justify-between group"
-        >
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
-              <FileText className="w-4 h-4" />
-            </span>
-            <div>
-              <h5 className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
-                Cotizador CPQ
-              </h5>
-              <p className="text-[11px] text-slate-400">Calcular y generar propuestas</p>
-            </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-        </div>
-      </div>
+      </section>
     </div>
   );
 };
